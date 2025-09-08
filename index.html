@@ -247,6 +247,11 @@
             color: white;
         }
 
+        .phase-status.completed {
+            background: #28a745;
+            color: white;
+        }
+
         .groups-container {
             padding: 20px;
             display: grid;
@@ -317,6 +322,26 @@
             gap: 15px;
         }
 
+        .round-section {
+            margin-bottom: 20px;
+        }
+
+        .round-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .matches-grid {
+            display: grid;
+            gap: 10px;
+        }
+
         .match-card {
             background: white;
             border: 2px solid #e9ecef;
@@ -328,6 +353,15 @@
             border-color: #ffc107;
         }
 
+        .match-card.waiting-draw {
+            border-color: #6c757d;
+            background: #f8f9fa;
+        }
+
+        .match-card.completed {
+            border-color: #28a745;
+        }
+
         .match-header {
             background: #f8f9fa;
             padding: 8px 15px;
@@ -336,6 +370,14 @@
             align-items: center;
             font-size: 12px;
             color: #666;
+        }
+
+        .match-card.waiting-draw .match-header {
+            background: #e9ecef;
+        }
+
+        .match-card.completed .match-header {
+            background: rgba(40, 167, 69, 0.1);
         }
 
         .match-teams {
@@ -361,6 +403,11 @@
             background: #f8f9fa;
             padding: 4px 8px;
             border-radius: 4px;
+        }
+
+        .team-score.winner {
+            background: #d4edda;
+            color: #155724;
         }
 
         .vs {
@@ -598,7 +645,7 @@
 
     <div class="modal" id="adminModal">
         <div class="modal-content">
-            <h3>🔐 เข้าสู่ระบบ Admin</h3>
+            <h3>🔒 เข้าสู่ระบบ Admin</h3>
             <input type="password" class="password-input" id="adminPassword" placeholder="รหัสผ่าน Admin" maxlength="3">
             <div class="modal-buttons">
                 <button class="modal-btn btn-cancel" onclick="closeAdminModal()">ยกเลิก</button>
@@ -650,7 +697,7 @@
                     <div class="phase-section">
                         <div class="phase-header">
                             <h3 class="phase-title">รอบแรก (Round Robin)</h3>
-                            <div class="phase-status">กำลังแข่งขัน</div>
+                            ${getRoundRobinStatus(category)}
                         </div>
                         <div class="groups-container">
                             ${generateGroups(category)}
@@ -660,70 +707,264 @@
                     <div class="phase-section">
                         <div class="phase-header">
                             <h3 class="phase-title">รอบน็อกเอาท์</h3>
-                            <div class="phase-status waiting">รอผลรอบแรก</div>
+                            ${getKnockoutStatus(category)}
                         </div>
                         <div class="knockout-bracket">
-                            <div class="match-card pending">
-                                <div class="match-header">
-                                    <span>TBD</span>
-                                    <span>รอการแข่งขัน</span>
-                                </div>
-                                <div class="match-teams">
-                                    <div class="team">
-                                        <span class="team-name">รอผลรอบแรก</span>
-                                        <span class="team-score">-</span>
-                                    </div>
-                                    <div class="vs">VS</div>
-                                    <div class="team">
-                                        <span class="team-name">รอผลรอบแรก</span>
-                                        <span class="team-score">-</span>
-                                    </div>
-                                </div>
-                            </div>
+                            ${generateKnockoutRounds(category)}
                         </div>
                     </div>
                     
                     <div class="phase-section">
                         <div class="phase-header">
                             <h3 class="phase-title">รอบชิงชนะเลิศ</h3>
-                            <div class="phase-status waiting">รอผลรองชนะเลิศ</div>
+                            ${getFinalsStatus(category)}
                         </div>
                         <div class="finals-container">
-                            <div class="final-match championship">
-                                <div class="match-label">ชิงชนะเลิศ</div>
-                                <div class="match-card pending">
-                                    <div class="match-teams">
-                                        <div class="team">
-                                            <span class="team-name">รอผลรองชนะเลิศ</span>
-                                            <span class="team-score">-</span>
-                                        </div>
-                                        <div class="vs">VS</div>
-                                        <div class="team">
-                                            <span class="team-name">รอผลรองชนะเลิศ</span>
-                                            <span class="team-score">-</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="final-match third-place">
-                                <div class="match-label">ชิงอันดับ 3</div>
-                                <div class="match-card pending">
-                                    <div class="match-teams">
-                                        <div class="team">
-                                            <span class="team-name">รอผลรองชนะเลิศ</span>
-                                            <span class="team-score">-</span>
-                                        </div>
-                                        <div class="vs">VS</div>
-                                        <div class="team">
-                                            <span class="team-name">รอผลรองชนะเลิศ</span>
-                                            <span class="team-score">-</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            ${generateFinalsMatches(category)}
                         </div>
                     </div>
+                </div>
+            `;
+        }
+
+        function getRoundRobinStatus(category) {
+            const statusMap = {
+                'มือ A': 'completed',
+                'มือ B': 'progress', 
+                'มือ C-B': 'pending',
+                'มือ C-C': 'pending',
+                'มือ D': 'pending',
+                'มือใหม่': 'pending',
+                'มือผสม': 'pending'
+            };
+            
+            const status = statusMap[category];
+            const statusText = {
+                'completed': 'เสร็จสิ้น',
+                'progress': 'กำลังแข่งขัน',
+                'pending': 'รอการแข่งขัน'
+            };
+            
+            const statusClass = status === 'completed' ? 'completed' : 
+                               status === 'progress' ? '' : 'waiting';
+            
+            return `<div class="phase-status ${statusClass}">${statusText[status]}</div>`;
+        }
+
+        function getKnockoutStatus(category) {
+            const statusMap = {
+                'มือ A': 'รอการแข่งขัน',
+                'มือ B': 'รอจับฉลาก',
+                'มือ C-B': 'รอจับฉลาก', 
+                'มือ C-C': 'รอผลรอบแรก',
+                'มือ D': 'รอผลรอบแรก',
+                'มือใหม่': 'รอผลรอบแรก',
+                'มือผสม': 'รอจับฉลาก'
+            };
+            
+            const status = statusMap[category] || 'รอการแข่งขัน';
+            const statusClass = status.includes('รอจับฉลาก') || status.includes('รอผลรอบแรก') ? 'waiting' : '';
+            
+            return `<div class="phase-status ${statusClass}">${status}</div>`;
+        }
+
+        function getFinalsStatus(category) {
+            return `<div class="phase-status waiting">รอผลรองชนะเลิศ</div>`;
+        }
+
+        function generateKnockoutRounds(category) {
+            const knockoutData = {
+                'มือ A': {
+                    rounds: [
+                        {
+                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                            matches: [
+                                { id: 'M007', team1: 'เอก-ชัย', team2: 'กอล์ฟ-น็อต', status: 'pending', score1: '-', score2: '-' },
+                                { id: 'M008', team1: 'โกอ้วน-นีล', team2: 'ต้น+Alai', status: 'pending', score1: '-', score2: '-' }
+                            ]
+                        }
+                    ]
+                },
+                'มือ B': {
+                    rounds: [
+                        {
+                            title: 'รอบ 8 ทีม',
+                            matches: [
+                                { id: 'M023', team1: 'ดี-นัท', team2: 'ไปท์-มุก', status: 'completed', score1: '2', score2: '0' },
+                                { id: 'M024', team1: 'บิว-อาร์ท', team2: 'โรบิ้น-เอกมุ่ย', status: 'completed', score1: '2', score2: '1' },
+                                { id: 'M025', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
+                                { id: 'M026', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' }
+                            ]
+                        },
+                        {
+                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                            matches: [
+                                { id: 'M027', team1: 'ดี-นัท', team2: 'บิว-อาร์ท', status: 'pending', score1: '-', score2: '-' },
+                                { id: 'M028', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' }
+                            ]
+                        }
+                    ]
+                },
+                'มือ C-B': {
+                    rounds: [
+                        {
+                            title: 'รอบ 8 ทีม',
+                            matches: [
+                                { id: 'M059', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
+                                { id: 'M060', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
+                                { id: 'M061', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
+                                { id: 'M062', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' }
+                            ]
+                        },
+                        {
+                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                            matches: [
+                                { id: 'M063', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' },
+                                { id: 'M064', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' }
+                            ]
+                        }
+                    ]
+                },
+                'มือ C-C': {
+                    rounds: [
+                        {
+                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                            matches: [
+                                { id: 'M092', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' },
+                                { id: 'M093', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' }
+                            ]
+                        }
+                    ]
+                },
+                'มือ D': {
+                    rounds: [
+                        {
+                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                            matches: [
+                                { id: 'M116', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' },
+                                { id: 'M117', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' }
+                            ]
+                        }
+                    ]
+                },
+                'มือใหม่': {
+                    rounds: [
+                        {
+                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                            matches: [
+                                { id: 'M136', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' },
+                                { id: 'M137', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' }
+                            ]
+                        }
+                    ]
+                },
+                'มือผสม': {
+                    rounds: [
+                        {
+                            title: 'รอบ 8 ทีม',
+                            matches: [
+                                { id: 'M152', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
+                                { id: 'M153', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
+                                { id: 'M154', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
+                                { id: 'M155', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' }
+                            ]
+                        },
+                        {
+                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                            matches: [
+                                { id: 'M156', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' },
+                                { id: 'M157', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' }
+                            ]
+                        }
+                    ]
+                }
+            };
+
+            const data = knockoutData[category];
+            if (!data) return '<div class="no-knockout">ไม่มีรอบน็อกเอาท์</div>';
+
+            return data.rounds.map(round => `
+                <div class="round-section">
+                    <h4 class="round-title">${round.title}</h4>
+                    <div class="matches-grid">
+                        ${round.matches.map(match => generateMatchCard(match)).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateMatchCard(match) {
+            const statusClass = match.status === 'waiting_draw' ? 'waiting-draw' : 
+                               match.status === 'completed' ? 'completed' : 'pending';
+            
+            const statusText = match.status === 'waiting_draw' ? 'รอจับฉลาก' :
+                              match.status === 'completed' ? 'เสร็จสิ้น' : 'รอการแข่งขัน';
+
+            return `
+                <div class="match-card ${statusClass}">
+                    <div class="match-header">
+                        <span>${match.id}</span>
+                        <span>${statusText}</span>
+                    </div>
+                    <div class="match-teams">
+                        <div class="team">
+                            <span class="team-name">${match.team1}</span>
+                            <span class="team-score ${match.status === 'completed' && match.score1 > match.score2 ? 'winner' : ''}">${match.score1}</span>
+                        </div>
+                        <div class="vs">VS</div>
+                        <div class="team">
+                            <span class="team-name">${match.team2}</span>
+                            <span class="team-score ${match.status === 'completed' && match.score2 > match.score1 ? 'winner' : ''}">${match.score2}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateFinalsMatches(category) {
+            const finalsData = {
+                'มือ A': {
+                    championship: { id: 'M009', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
+                    thirdPlace: { id: 'M010', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
+                },
+                'มือ B': {
+                    championship: { id: 'M029', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
+                    thirdPlace: { id: 'M030', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
+                },
+                'มือ C-B': {
+                    championship: { id: 'M065', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
+                    thirdPlace: { id: 'M066', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
+                },
+                'มือ C-C': {
+                    championship: { id: 'M094', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
+                    thirdPlace: { id: 'M095', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
+                },
+                'มือ D': {
+                    championship: { id: 'M118', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
+                    thirdPlace: { id: 'M119', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
+                },
+                'มือใหม่': {
+                    championship: { id: 'M138', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
+                    thirdPlace: { id: 'M139', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
+                },
+                'มือผสม': {
+                    championship: { id: 'M158', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
+                    thirdPlace: { id: 'M159', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
+                }
+            };
+
+            const data = finalsData[category];
+            if (!data) return '<div class="no-finals">ไม่มีรอบชิงชนะเลิศ</div>';
+
+            return `
+                <div class="final-match championship">
+                    <div class="match-label">🏆 ชิงชนะเลิศ</div>
+                    ${generateMatchCard({...data.championship, score1: '-', score2: '-'})}
+                </div>
+                
+                <div class="final-match third-place">
+                    <div class="match-label">🥉 ชิงอันดับ 3</div>
+                    ${generateMatchCard({...data.thirdPlace, score1: '-', score2: '-'})}
                 </div>
             `;
         }
@@ -731,12 +972,12 @@
         function getCategoryInfo(category) {
             const info = {
                 'มือ A': { teams: 6, groups: 2, matches: 10 },
-                'มือ B': { teams: 12, groups: 4, matches: 20 },
-                'มือ C-B': { teams: 17, groups: 4, matches: 36 },
-                'มือ C-C': { teams: 11, groups: 2, matches: 29 },
-                'มือ D': { teams: 10, groups: 2, matches: 24 },
-                'มือใหม่': { teams: 9, groups: 2, matches: 20 },
-                'มือผสม': { teams: 12, groups: 4, matches: 20 }
+                'มือ B': { teams: 12, groups: 4, matches: 30 },
+                'มือ C-B': { teams: 17, groups: 4, matches: 66 },
+                'มือ C-C': { teams: 11, groups: 2, matches: 95 },
+                'มือ D': { teams: 10, groups: 2, matches: 119 },
+                'มือใหม่': { teams: 9, groups: 2, matches: 139 },
+                'มือผสม': { teams: 12, groups: 4, matches: 159 }
             };
             return info[category] || { teams: 0, groups: 0, matches: 0 };
         }
@@ -781,17 +1022,17 @@
                     { 
                         name: 'สาย 3', 
                         teams: [
-                            { name: 'พี่เหมี่ยว-อามอ', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'เติ้ง-โจน', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'ทอม-พี่หนุ่ม', played: 0, wins: 0, points: 0, qualified: false }
+                            { name: 'พี่เหมี่ยว-อามอ', played: 3, wins: 2, points: 7, qualified: true },
+                            { name: 'เติ้ง-โจน', played: 3, wins: 2, points: 6, qualified: true },
+                            { name: 'ทอม-พี่หนุ่ม', played: 2, wins: 0, points: 0, qualified: false }
                         ]
                     },
                     { 
                         name: 'สาย 4', 
                         teams: [
-                            { name: 'เอก-เตี้ย', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'เพียว-พี่ตู้', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'โก้-แต้ม', played: 0, wins: 0, points: 0, qualified: false }
+                            { name: 'เอก-เตี้ย', played: 3, wins: 3, points: 9, qualified: true },
+                            { name: 'เพียว-พี่ตู้', played: 3, wins: 1, points: 4, qualified: true },
+                            { name: 'โก้-แต้ม', played: 2, wins: 0, points: 0, qualified: false }
                         ]
                     }
                 ],
@@ -978,7 +1219,7 @@
             if (password === '987') {
                 isAdminMode = true;
                 closeAdminModal();
-                alert('เข้าสู่ระบบ Admin สำเร็จ\n(ฟีเจอร์ Admin จะพัฒนาใน Part 5)');
+                alert('เข้าสู่ระบบ Admin สำเร็จ\n(ฟีเจอร์ Admin จะพัฒนาใน Part 4)');
             } else {
                 alert('รหัสผ่านไม่ถูกต้อง');
                 document.getElementById('adminPassword').value = '';
