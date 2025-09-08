@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MN Badminton Tournament 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .admin-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .category-btn {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #dee2e6;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border-color: #0056b3;
+        }
+
+        .category-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .category-info {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            background: #28a745;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .content-area {
+            padding: 20px;
+            min-height: 400px;
+        }
+
+        .welcome-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .welcome-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+        }
+
+        .welcome-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .welcome-text {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Bracket Styles */
+        .bracket-container {
+            padding: 0;
+        }
+
+        .bracket-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin: -20px -20px 20px -20px;
+        }
+
+        .bracket-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .bracket-stats {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .phase-section {
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .phase-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .phase-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .phase-status {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #ffc107;
+            color: #000;
+        }
+
+        .phase-status.waiting {
+            background: #6c757d;
+            color: white;
+        }
+
+        .groups-container {
+            padding: 20px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .group-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .group-title {
+            background: #343a40;
+            color: white;
+            padding: 12px 15px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .standings-table {
+            background: white;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 40px 1fr 40px 40px 50px;
+            gap: 10px;
+            padding: 10px 15px;
+            background: #e9ecef;
+            font-weight: 600;
+            font-size: 12px;
+            color: #495057;
+        }
+
+        .team-row {
+            display: grid;
+            grid-template-columns: 40px 1fr 40px 40px 50px;
+            gap: 10px;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f1f3f4;
+            align-items: center;
+        }
+
+        .team-row.qualified {
+            background: rgba(40, 167, 69, 0.1);
+            border-left: 4px solid #28a745;
+        }
+
+        .rank {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .team-name {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .points {
+            font-weight: 600;
+            color: #007bff;
+        }
+
+        .knockout-bracket {
+            padding: 20px;
+            display: grid;
+            gap: 15px;
+        }
+
+        .match-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .match-card.pending {
+            border-color: #ffc107;
+        }
+
+        .match-header {
+            background: #f8f9fa;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .match-teams {
+            padding: 15px;
+        }
+
+        .team {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .team:last-child {
+            border-bottom: none;
+        }
+
+        .team-score {
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .vs {
+            text-align: center;
+            font-weight: 600;
+            color: #666;
+            padding: 5px 0;
+            font-size: 12px;
+        }
+
+        .finals-container {
+            padding: 20px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .final-match {
+            text-align: center;
+        }
+
+        .match-label {
+            background: #343a40;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .championship .match-label {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+            color: #333;
+        }
+
+        .third-place .match-label {
+            background: #cd7f32;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn-login {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .refresh-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .refresh-btn {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .admin-btn {
+                top: 15px;
+                right: 15px;
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+
+            .table-header,
+            .team-row {
+                grid-template-columns: 30px 1fr 35px 35px 45px;
+                gap: 8px;
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 768px;
+            }
+            
+            .category-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .groups-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="admin-btn" onclick="openAdminModal()">👤 Admin</button>
+            <h1>🏸 MN Badminton Tournament</h1>
+            <div class="subtitle">77 ทีม • 7 ประเภท • 159 แมท</div>
+        </div>
+
+        <div class="nav-container">
+            <div class="nav-title">เลือกประเภทการแข่งขัน</div>
+            <div class="category-grid">
+                <div class="category-btn" onclick="selectCategory('มือ A')">
+                    <div class="category-name">มือ A</div>
+                    <div class="category-info">6 ทีม • 2 สาย</div>
+                    <div class="status-badge">6</div>
+                </div>
+                
+                <div class="category-btn" onclick="selectCategory('มือ B')">
+                    <div class="category-name">มือ B</div>
+                    <div class="category-info">12 ทีม • 4 สาย</div>
+                    <div class="status-badge">12</div>
+                </div>
+                
+                <div class="category-btn" onclick="selectCategory('มือ C-B')">
+                    <div class="category-name">มือ C-B</div>
+                    <div class="category-info">17 ทีม • 4 สาย</div>
+                    <div class="status-badge">17</div>
+                </div>
+                
+                <div class="category-btn" onclick="selectCategory('มือ C-C')">
+                    <div class="category-name">มือ C-C</div>
+                    <div class="category-info">11 ทีม • 2 สาย</div>
+                    <div class="status-badge">11</div>
+                </div>
+                
+                <div class="category-btn" onclick="selectCategory('มือ D')">
+                    <div class="category-name">มือ D</div>
+                    <div class="category-info">10 ทีม • 2 สาย</div>
+                    <div class="status-badge">10</div>
+                </div>
+                
+                <div class="category-btn" onclick="selectCategory('มือใหม่')">
+                    <div class="category-name">มือใหม่</div>
+                    <div class="category-info">9 ทีม • 2 สาย</div>
+                    <div class="status-badge">9</div>
+                </div>
+                
+                <div class="category-btn" onclick="selectCategory('มือผสม')" style="grid-column: 1 / -1;">
+                    <div class="category-name">มือผสม</div>
+                    <div class="category-info">12 ทีม • 4 สาย</div>
+                    <div class="status-badge">12</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area" id="contentArea">
+            <div class="welcome-screen">
+                <div class="welcome-icon">🏸</div>
+                <div class="welcome-title">ยินดีต้อนรับสู่การแข่งขัน</div>
+                <div class="welcome-text">
+                    เลือกประเภทการแข่งขันด้านบนเพื่อดูผลการแข่งขันและตารางการแข่งขัน
+                    <br><br>
+                    📱 แอปนี้ออกแบบมาเพื่อการใช้งานบนมือถือ
+                </div>
+            </div>
+        </div>
+
+        <div class="refresh-container">
+            <button class="refresh-btn" onclick="refreshData()" title="รีเฟรชข้อมูล">🔄</button>
+        </div>
+    </div>
+
+    <div class="modal" id="adminModal">
+        <div class="modal-content">
+            <h3>🔐 เข้าสู่ระบบ Admin</h3>
+            <input type="password" class="password-input" id="adminPassword" placeholder="รหัสผ่าน Admin" maxlength="3">
+            <div class="modal-buttons">
+                <button class="modal-btn btn-cancel" onclick="closeAdminModal()">ยกเลิก</button>
+                <button class="modal-btn btn-login" onclick="adminLogin()">เข้าสู่ระบบ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCategory = null;
+        let isAdminMode = false;
+
+        function selectCategory(category) {
+            // Remove active class
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            event.target.closest('.category-btn').classList.add('active');
+            currentCategory = category;
+            
+            // Show loading
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>กำลังโหลดข้อมูล ${category}...</div>
+                </div>
+            `;
+            
+            // Show bracket after delay
+            setTimeout(() => {
+                showBracket(category);
+            }, 1000);
+        }
+
+        function showBracket(category) {
+            const contentArea = document.getElementById('contentArea');
+            const info = getCategoryInfo(category);
+            
+            contentArea.innerHTML = `
+                <div class="bracket-container">
+                    <div class="bracket-header">
+                        <h2 class="bracket-title">${category}</h2>
+                        <div class="bracket-stats">${info.teams} ทีม • ${info.groups} สาย • ${info.matches} แมท</div>
+                    </div>
+                    
+                    <div class="phase-section">
+                        <div class="phase-header">
+                            <h3 class="phase-title">รอบแรก (Round Robin)</h3>
+                            <div class="phase-status">กำลังแข่งขัน</div>
+                        </div>
+                        <div class="groups-container">
+                            ${generateGroups(category)}
+                        </div>
+                    </div>
+                    
+                    <div class="phase-section">
+                        <div class="phase-header">
+                            <h3 class="phase-title">รอบน็อกเอาท์</h3>
+                            <div class="phase-status waiting">รอผลรอบแรก</div>
+                        </div>
+                        <div class="knockout-bracket">
+                            <div class="match-card pending">
+                                <div class="match-header">
+                                    <span>TBD</span>
+                                    <span>รอการแข่งขัน</span>
+                                </div>
+                                <div class="match-teams">
+                                    <div class="team">
+                                        <span class="team-name">รอผลรอบแรก</span>
+                                        <span class="team-score">-</span>
+                                    </div>
+                                    <div class="vs">VS</div>
+                                    <div class="team">
+                                        <span class="team-name">รอผลรอบแรก</span>
+                                        <span class="team-score">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="phase-section">
+                        <div class="phase-header">
+                            <h3 class="phase-title">รอบชิงชนะเลิศ</h3>
+                            <div class="phase-status waiting">รอผลรองชนะเลิศ</div>
+                        </div>
+                        <div class="finals-container">
+                            <div class="final-match championship">
+                                <div class="match-label">ชิงชนะเลิศ</div>
+                                <div class="match-card pending">
+                                    <div class="match-teams">
+                                        <div class="team">
+                                            <span class="team-name">รอผลรองชนะเลิศ</span>
+                                            <span class="team-score">-</span>
+                                        </div>
+                                        <div class="vs">VS</div>
+                                        <div class="team">
+                                            <span class="team-name">รอผลรองชนะเลิศ</span>
+                                            <span class="team-score">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="final-match third-place">
+                                <div class="match-label">ชิงอันดับ 3</div>
+                                <div class="match-card pending">
+                                    <div class="match-teams">
+                                        <div class="team">
+                                            <span class="team-name">รอผลรองชนะเลิศ</span>
+                                            <span class="team-score">-</span>
+                                        </div>
+                                        <div class="vs">VS</div>
+                                        <div class="team">
+                                            <span class="team-name">รอผลรองชนะเลิศ</span>
+                                            <span class="team-score">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getCategoryInfo(category) {
+            const info = {
+                'มือ A': { teams: 6, groups: 2, matches: 10 },
+                'มือ B': { teams: 12, groups: 4, matches: 20 },
+                'มือ C-B': { teams: 17, groups: 4, matches: 36 },
+                'มือ C-C': { teams: 11, groups: 2, matches: 29 },
+                'มือ D': { teams: 10, groups: 2, matches: 24 },
+                'มือใหม่': { teams: 9, groups: 2, matches: 20 },
+                'มือผสม': { teams: 12, groups: 4, matches: 20 }
+            };
+            return info[category] || { teams: 0, groups: 0, matches: 0 };
+        }
+
+        function generateGroups(category) {
+            const groups = {
+                'มือ A': [
+                    { 
+                        name: 'สาย 1', 
+                        teams: [
+                            { name: 'เอก-ชัย', played: 2, wins: 2, points: 6, qualified: true },
+                            { name: 'ต้น+Alai', played: 2, wins: 1, points: 3, qualified: true },
+                            { name: 'โค้ทนัท-โกอ๊อต', played: 2, wins: 0, points: 0, qualified: false }
+                        ]
+                    },
+                    { 
+                        name: 'สาย 2', 
+                        teams: [
+                            { name: 'โกอ้วน-นีล', played: 2, wins: 2, points: 6, qualified: true },
+                            { name: 'กอล์ฟ-น็อต', played: 2, wins: 1, points: 3, qualified: true },
+                            { name: 'เนส-ไปท์', played: 2, wins: 0, points: 0, qualified: false }
+                        ]
+                    }
+                ],
+                'มือ B': [
+                    { 
+                        name: 'สาย 1', 
+                        teams: [
+                            { name: 'ดี-นัท', played: 2, wins: 2, points: 6, qualified: true },
+                            { name: 'โรบิ้น-เอกมุ่ย', played: 2, wins: 1, points: 3, qualified: true },
+                            { name: 'ชัย-แบงค์ 1000', played: 2, wins: 0, points: 0, qualified: false }
+                        ]
+                    },
+                    { 
+                        name: 'สาย 2', 
+                        teams: [
+                            { name: 'บิว-อาร์ท', played: 2, wins: 2, points: 6, qualified: true },
+                            { name: 'ไปท์-มุก', played: 2, wins: 1, points: 3, qualified: true },
+                            { name: 'โค้ทนัท-บีม', played: 2, wins: 0, points: 0, qualified: false }
+                        ]
+                    },
+                    { 
+                        name: 'สาย 3', 
+                        teams: [
+                            { name: 'พี่เหมี่ยว-อามอ', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'เติ้ง-โจน', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'ทอม-พี่หนุ่ม', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    },
+                    { 
+                        name: 'สาย 4', 
+                        teams: [
+                            { name: 'เอก-เตี้ย', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'เพียว-พี่ตู้', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'โก้-แต้ม', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    }
+                ],
+                'มือ C-B': [
+                    { 
+                        name: 'สาย 1', 
+                        teams: [
+                            { name: 'บิว-ชัย', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'โจน-มาร์ค', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'แชมป์-เหน่ง', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'โรบิ้น-หยาง', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    },
+                    { 
+                        name: 'สาย 2', 
+                        teams: [
+                            { name: 'เตี้ย-อัพ', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'เพียว-เนส', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'ทอม-จิ๊บ', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'พฤกษ์-หนุ่ม', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    },
+                    { 
+                        name: 'สาย 3', 
+                        teams: [
+                            { name: 'สตีฟ-ฟลุ๊ค', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'แบงค์1000-โกกุ่ย', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'โกดุง-มุย', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'ชิ-พี่เอ๋', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    },
+                    { 
+                        name: 'สาย 4', 
+                        teams: [
+                            { name: 'อาร์ท-พี่อู๊ด', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'น็อต-พี่ต๋อม', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'พี่อั๋น-ครูเล็ก', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'โชค-โอม', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'ชิฟ-ฟ้า', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    }
+                ],
+                'มือ C-C': [
+                    { 
+                        name: 'สาย 1', 
+                        teams: [
+                            { name: 'อัพ-ชม', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'เจต-มาร์ค', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'หยาง-กวาง', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'นุช-ออย', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'หนึ่ง-ก๊อต', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    },
+                    { 
+                        name: 'สาย 2', 
+                        teams: [
+                            { name: 'ต๋อม-พี่กิ่ง', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'มุก-ต้อม', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'น้าพจน์-อั๋น', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'มิ้น-นิว', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'บี-สา', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'สตีฟ-พิม', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    }
+                ],
+                'มือ D': [
+                    { 
+                        name: 'สาย 1', 
+                        teams: [
+                            { name: 'แหม่ม-นาวา', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'โอ็ค-ไอซ์', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'มาร์ค-ลิฟ', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'กุ่ย-กานต์', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'แอร์-ชิน', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    },
+                    { 
+                        name: 'สาย 2', 
+                        teams: [
+                            { name: 'เช่-ฉัตร', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'บอล-ปาล์ม', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'กวาง-อิง', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'มุก-อาร์ม', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'ออม-นิว', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    }
+                ],
+                'มือใหม่': [
+                    { 
+                        name: 'สาย 1', 
+                        teams: [
+                            { name: 'อุ๊-ลูกชาย', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'โดนัท-แอร์', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'แอม-บอส', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'นิวเยียร์-แองกี้เบิร์ด', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    },
+                    { 
+                        name: 'สาย 2', 
+                        teams: [
+                            { name: 'ตุ๊กติ๊ก-มะปราง', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'กาน-มล', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'โกริน-น้านก', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'จำปูน-นิชา', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'ปุ้ย-รัก', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    }
+                ],
+                'มือผสม': [
+                    { 
+                        name: 'สาย 1', 
+                        teams: [
+                            { name: 'ชม-พี่ฮวด', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'เนส-บีม', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'นิกกี้-นิว', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    },
+                    { 
+                        name: 'สาย 2', 
+                        teams: [
+                            { name: 'แฟ้ม-มุก', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'ชิ-ฟาง', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'ชัย-คาเมล', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    },
+                    { 
+                        name: 'สาย 3', 
+                        teams: [
+                            { name: 'กิ่ง-กาย', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'โก้-ออม', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'วา-อาหมิง', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    },
+                    { 
+                        name: 'สาย 4', 
+                        teams: [
+                            { name: 'มล-นัท', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'เหว่ยฮั่น-ตุ๊กติ๊ก', played: 0, wins: 0, points: 0, qualified: false },
+                            { name: 'ป๊อป-ซัน', played: 0, wins: 0, points: 0, qualified: false }
+                        ]
+                    }
+                ]
+            };
+            
+            const categoryGroups = groups[category] || [{ name: 'สาย 1', teams: [{ name: 'ทีม A', played: 0, wins: 0, points: 0, qualified: false }] }];
+            
+            return categoryGroups.map(group => `
+                <div class="group-card">
+                    <div class="group-title">${group.name}</div>
+                    <div class="standings-table">
+                        <div class="table-header">
+                            <span>อันดับ</span>
+                            <span>ทีม</span>
+                            <span>แมท</span>
+                            <span>ชนะ</span>
+                            <span>คะแนน</span>
+                        </div>
+                        ${group.teams.map((team, index) => `
+                            <div class="team-row ${team.qualified ? 'qualified' : ''}">
+                                <span class="rank">${index + 1}</span>
+                                <span class="team-name">${team.name}</span>
+                                <span>${team.played}</span>
+                                <span>${team.wins}</span>
+                                <span class="points">${team.points}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openAdminModal() {
+            document.getElementById('adminModal').style.display = 'block';
+            document.getElementById('adminPassword').focus();
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === '987') {
+                isAdminMode = true;
+                closeAdminModal();
+                alert('เข้าสู่ระบบ Admin สำเร็จ\n(ฟีเจอร์ Admin จะพัฒนาใน Part 5)');
+            } else {
+                alert('รหัสผ่านไม่ถูกต้อง');
+                document.getElementById('adminPassword').value = '';
+            }
+        }
+
+        function refreshData() {
+            if (currentCategory) {
+                selectCategory(currentCategory);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    adminLogin();
+                }
+            });
+            
+            document.getElementById('adminModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeAdminModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
