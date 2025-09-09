@@ -185,7 +185,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Bracket Styles */
         .bracket-container {
             padding: 0;
         }
@@ -314,6 +313,137 @@
         .points {
             font-weight: 600;
             color: #007bff;
+        }
+
+        .round-robin-matches {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            background: #fafafa;
+        }
+
+        .matches-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .group-matches {
+            margin-bottom: 20px;
+        }
+
+        .group-matches-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: #343a40;
+            color: white;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .round-robin-match-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .round-robin-match-card.completed {
+            border-color: #28a745;
+        }
+
+        .round-robin-match-card.pending {
+            border-color: #ffc107;
+        }
+
+        .rr-match-header {
+            background: #f8f9fa;
+            padding: 6px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .round-robin-match-card.completed .rr-match-header {
+            background: rgba(40, 167, 69, 0.1);
+        }
+
+        .rr-match-teams {
+            padding: 12px;
+        }
+
+        .rr-team {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .rr-team:last-child {
+            border-bottom: none;
+        }
+
+        .rr-team-name {
+            font-size: 13px;
+            color: #333;
+            flex: 1;
+        }
+
+        .rr-team-sets {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .set-score {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .set-score.winner {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .rr-team-score {
+            font-weight: 600;
+            min-width: 25px;
+            text-align: center;
+            background: #e9ecef;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .rr-team-score.winner {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .rr-vs {
+            text-align: center;
+            font-weight: 600;
+            color: #666;
+            padding: 3px 0;
+            font-size: 10px;
         }
 
         .knockout-bracket {
@@ -526,49 +656,6 @@
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
             transition: all 0.3s ease;
         }
-
-        @media (max-width: 480px) {
-            .container {
-                max-width: 100%;
-            }
-            
-            .header {
-                padding: 15px;
-            }
-            
-            .header h1 {
-                font-size: 20px;
-            }
-            
-            .admin-btn {
-                top: 15px;
-                right: 15px;
-                font-size: 11px;
-                padding: 6px 10px;
-            }
-
-            .table-header,
-            .team-row {
-                grid-template-columns: 30px 1fr 35px 35px 45px;
-                gap: 8px;
-                padding: 10px 12px;
-                font-size: 12px;
-            }
-        }
-
-        @media (min-width: 768px) {
-            .container {
-                max-width: 768px;
-            }
-            
-            .category-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .groups-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
     </style>
 </head>
 <body>
@@ -645,7 +732,7 @@
 
     <div class="modal" id="adminModal">
         <div class="modal-content">
-            <h3>🔒 เข้าสู่ระบบ Admin</h3>
+            <h3>🔑 เข้าสู่ระบบ Admin</h3>
             <input type="password" class="password-input" id="adminPassword" placeholder="รหัสผ่าน Admin" maxlength="3">
             <div class="modal-buttons">
                 <button class="modal-btn btn-cancel" onclick="closeAdminModal()">ยกเลิก</button>
@@ -658,17 +745,207 @@
         let currentCategory = null;
         let isAdminMode = false;
 
+        const roundRobinData = {
+            'มือ A': [
+                {
+                    groupName: 'สาย 1',
+                    matches: [
+                        { id: 'M001', team1: 'เอก-ชัย', team2: 'โค้ทนัท-โกอ๊อต', score1: 21, score2: 15, status: 'completed' },
+                        { id: 'M002', team1: 'เอก-ชัย', team2: 'ต้น+Alai', score1: 21, score2: 18, status: 'completed' },
+                        { id: 'M003', team1: 'โค้ทนัท-โกอ๊อต', team2: 'ต้น+Alai', score1: 16, score2: 21, status: 'completed' }
+                    ]
+                },
+                {
+                    groupName: 'สาย 2',
+                    matches: [
+                        { id: 'M004', team1: 'เนส-ไปท์', team2: 'โกอ้วน-นีล', score1: 12, score2: 21, status: 'completed' },
+                        { id: 'M005', team1: 'เนส-ไปท์', team2: 'กอล์ฟ-น็อต', score1: 18, score2: 21, status: 'completed' },
+                        { id: 'M006', team1: 'โกอ้วน-นีล', team2: 'กอล์ฟ-น็อต', score1: 21, score2: 19, status: 'completed' }
+                    ]
+                }
+            ],
+            'มือ B': [
+                {
+                    groupName: 'สาย 1',
+                    matches: [
+                        { id: 'M011', team1: 'ดี-นัท', team2: 'โรบิ้น-เอกมุ่ย', score1: 21, score2: 17, status: 'completed' },
+                        { id: 'M012', team1: 'ดี-นัท', team2: 'ชัย-แบงค์ 1000', score1: 21, score2: 14, status: 'completed' },
+                        { id: 'M013', team1: 'โรบิ้น-เอกมุ่ย', team2: 'ชัย-แบงค์ 1000', score1: 21, score2: 16, status: 'completed' }
+                    ]
+                },
+                {
+                    groupName: 'สาย 2',
+                    matches: [
+                        { id: 'M014', team1: 'โค้ทนัท-บีม', team2: 'บิว-อาร์ท', score1: 15, score2: 21, status: 'completed' },
+                        { id: 'M015', team1: 'โค้ทนัท-บีม', team2: 'ไปท์-มุก', score1: 18, score2: 21, status: 'completed' },
+                        { id: 'M016', team1: 'บิว-อาร์ท', team2: 'ไปท์-มุก', score1: 21, score2: 19, status: 'completed' }
+                    ]
+                },
+                {
+                    groupName: 'สาย 3',
+                    matches: [
+                        { id: 'M017', team1: 'พี่เหมี่ยว-อามอ', team2: 'เติ้ง-โจน', score1: 21, score2: 19, status: 'completed' },
+                        { id: 'M018', team1: 'พี่เหมี่ยว-อามอ', team2: 'ทอม-พี่หนุ่ม', score1: 19, score2: 21, status: 'completed' },
+                        { id: 'M019', team1: 'เติ้ง-โจน', team2: 'ทอม-พี่หนุ่ม', score1: 21, score2: 16, status: 'completed' }
+                    ]
+                },
+                {
+                    groupName: 'สาย 4',
+                    matches: [
+                        { id: 'M020', team1: 'เอก-เตี้ย', team2: 'เพียว-พี่ตู้', score1: 21, score2: 18, status: 'completed' },
+                        { id: 'M021', team1: 'เอก-เตี้ย', team2: 'โก้-แต้ม', score1: 21, score2: 15, status: 'completed' },
+                        { id: 'M022', team1: 'เพียว-พี่ตู้', team2: 'โก้-แต้ม', score1: 21, score2: 17, status: 'completed' }
+                    ]
+                }
+            ]
+        };
+
+        const knockoutData = {
+            'มือ A': {
+                rounds: [
+                    {
+                        title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                        matches: [
+                            { id: 'M007', team1: 'เอก-ชัย', team2: 'กอล์ฟ-น็อต', status: 'completed', score1: '2', score2: '0' },
+                            { id: 'M008', team1: 'โกอ้วน-นีล', team2: 'ต้น+Alai', status: 'completed', score1: '2', score2: '1' }
+                        ]
+                    }
+                ]
+            },
+            'มือ B': {
+                rounds: [
+                    {
+                        title: 'รอบ 8 ทีม',
+                        matches: [
+                            { id: 'M023', team1: 'ดี-นัท', team2: 'ไปท์-มุก', status: 'completed', score1: '2', score2: '0' },
+                            { id: 'M024', team1: 'บิว-อาร์ท', team2: 'โรบิ้น-เอกมุ่ย', status: 'completed', score1: '2', score2: '1' },
+                            { id: 'M025', team1: 'เติ้ง-โจน', team2: 'เพียว-พี่ตู้', status: 'waiting_draw', score1: '-', score2: '-' },
+                            { id: 'M026', team1: 'เอก-เตี้ย', team2: 'ทอม-พี่หนุ่ม', status: 'waiting_draw', score1: '-', score2: '-' }
+                        ]
+                    },
+                    {
+                        title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                        matches: [
+                            { id: 'M027', team1: 'ดี-นัท', team2: 'บิว-อาร์ท', status: 'pending', score1: '-', score2: '-' },
+                            { id: 'M028', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' }
+                        ]
+                    }
+                ]
+            },
+            'มือ C-B': {
+                rounds: [
+                    {
+                        title: 'รอบ 8 ทีม',
+                        matches: [
+                            { id: 'M059', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
+                            { id: 'M060', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
+                            { id: 'M061', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
+                            { id: 'M062', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' }
+                        ]
+                    },
+                    {
+                        title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                        matches: [
+                            { id: 'M063', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' },
+                            { id: 'M064', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' }
+                        ]
+                    }
+                ]
+            },
+            'มือ C-C': {
+                rounds: [
+                    {
+                        title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                        matches: [
+                            { id: 'M092', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' },
+                            { id: 'M093', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' }
+                        ]
+                    }
+                ]
+            },
+            'มือ D': {
+                rounds: [
+                    {
+                        title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                        matches: [
+                            { id: 'M116', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' },
+                            { id: 'M117', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' }
+                        ]
+                    }
+                ]
+            },
+            'มือใหม่': {
+                rounds: [
+                    {
+                        title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                        matches: [
+                            { id: 'M136', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' },
+                            { id: 'M137', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' }
+                        ]
+                    }
+                ]
+            },
+            'มือผสม': {
+                rounds: [
+                    {
+                        title: 'รอบ 8 ทีม',
+                        matches: [
+                            { id: 'M152', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
+                            { id: 'M153', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
+                            { id: 'M154', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
+                            { id: 'M155', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' }
+                        ]
+                    },
+                    {
+                        title: 'รอบ 4 ทีม (รองชนะเลิศ)',
+                        matches: [
+                            { id: 'M156', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' },
+                            { id: 'M157', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        const finalsData = {
+            'มือ A': {
+                championship: { id: 'M009', team1: 'เอก-ชัย', team2: 'โกอ้วน-นีล', status: 'completed', score1: '2', score2: '0' },
+                thirdPlace: { id: 'M010', team1: 'กอล์ฟ-น็อต', team2: 'ต้น+Alai', status: 'completed', score1: '2', score2: '1' }
+            },
+            'มือ B': {
+                championship: { id: 'M029', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
+                thirdPlace: { id: 'M030', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
+            },
+            'มือ C-B': {
+                championship: { id: 'M065', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
+                thirdPlace: { id: 'M066', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
+            },
+            'มือ C-C': {
+                championship: { id: 'M094', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
+                thirdPlace: { id: 'M095', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
+            },
+            'มือ D': {
+                championship: { id: 'M118', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
+                thirdPlace: { id: 'M119', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
+            },
+            'มือใหม่': {
+                championship: { id: 'M138', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
+                thirdPlace: { id: 'M139', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
+            },
+            'มือผสม': {
+                championship: { id: 'M158', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
+                thirdPlace: { id: 'M159', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
+            }
+        };
+
         function selectCategory(category) {
-            // Remove active class
             document.querySelectorAll('.category-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             
-            // Add active class to clicked button
             event.target.closest('.category-btn').classList.add('active');
             currentCategory = category;
             
-            // Show loading
             const contentArea = document.getElementById('contentArea');
             contentArea.innerHTML = `
                 <div class="loading">
@@ -677,7 +954,6 @@
                 </div>
             `;
             
-            // Show bracket after delay
             setTimeout(() => {
                 showBracket(category);
             }, 1000);
@@ -701,6 +977,10 @@
                         </div>
                         <div class="groups-container">
                             ${generateGroups(category)}
+                        </div>
+                        <div class="round-robin-matches">
+                            <h4 class="matches-section-title">รายการแมทรอบแรก</h4>
+                            ${generateRoundRobinMatches(category)}
                         </div>
                     </div>
                     
@@ -730,7 +1010,7 @@
         function getRoundRobinStatus(category) {
             const statusMap = {
                 'มือ A': 'completed',
-                'มือ B': 'progress', 
+                'มือ B': 'completed', 
                 'มือ C-B': 'pending',
                 'มือ C-C': 'pending',
                 'มือ D': 'pending',
@@ -753,8 +1033,8 @@
 
         function getKnockoutStatus(category) {
             const statusMap = {
-                'มือ A': 'รอการแข่งขัน',
-                'มือ B': 'รอจับฉลาก',
+                'มือ A': 'เสร็จสิ้น',
+                'มือ B': 'กำลังแข่งขัน',
                 'มือ C-B': 'รอจับฉลาก', 
                 'มือ C-C': 'รอผลรอบแรก',
                 'มือ D': 'รอผลรอบแรก',
@@ -763,123 +1043,69 @@
             };
             
             const status = statusMap[category] || 'รอการแข่งขัน';
-            const statusClass = status.includes('รอจับฉลาก') || status.includes('รอผลรอบแรก') ? 'waiting' : '';
+            const statusClass = status.includes('รอจับฉลาก') || status.includes('รอผลรอบแรก') ? 'waiting' : 
+                               status === 'เสร็จสิ้น' ? 'completed' : '';
             
             return `<div class="phase-status ${statusClass}">${status}</div>`;
         }
 
         function getFinalsStatus(category) {
-            return `<div class="phase-status waiting">รอผลรองชนะเลิศ</div>`;
+            const statusMap = {
+                'มือ A': 'เสร็จสิ้น',
+                'มือ B': 'รอผลรองชนะเลิศ',
+                'มือ C-B': 'รอผลรองชนะเลิศ',
+                'มือ C-C': 'รอผลรองชนะเลิศ',
+                'มือ D': 'รอผลรองชนะเลิศ',
+                'มือใหม่': 'รอผลรองชนะเลิศ',
+                'มือผสม': 'รอผลรองชนะเลิศ'
+            };
+            
+            const status = statusMap[category] || 'รอผลรองชนะเลิศ';
+            const statusClass = status === 'เสร็จสิ้น' ? 'completed' : 'waiting';
+            
+            return `<div class="phase-status ${statusClass}">${status}</div>`;
+        }
+
+        function generateRoundRobinMatches(category) {
+            const categoryMatches = roundRobinData[category];
+            if (!categoryMatches) {
+                return '<div class="no-matches">ข้อมูลแมทจะพัฒนาใน Part 4</div>';
+            }
+
+            return categoryMatches.map(group => `
+                <div class="group-matches">
+                    <div class="group-matches-title">${group.groupName}</div>
+                    ${group.matches.map(match => generateRoundRobinMatchCard(match)).join('')}
+                </div>
+            `).join('');
+        }
+
+        function generateRoundRobinMatchCard(match) {
+            const statusClass = match.status === 'completed' ? 'completed' : 'pending';
+            const statusText = match.status === 'completed' ? 'เสร็จสิ้น' : 'รอการแข่งขัน';
+
+            return `
+                <div class="round-robin-match-card ${statusClass}">
+                    <div class="rr-match-header">
+                        <span>${match.id}</span>
+                        <span>${statusText}</span>
+                    </div>
+                    <div class="rr-match-teams">
+                        <div class="rr-team">
+                            <span class="rr-team-name">${match.team1}</span>
+                            <span class="rr-team-score ${match.status === 'completed' && match.score1 > match.score2 ? 'winner' : ''}">${match.score1}</span>
+                        </div>
+                        <div class="rr-vs">VS</div>
+                        <div class="rr-team">
+                            <span class="rr-team-name">${match.team2}</span>
+                            <span class="rr-team-score ${match.status === 'completed' && match.score2 > match.score1 ? 'winner' : ''}">${match.score2}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function generateKnockoutRounds(category) {
-            const knockoutData = {
-                'มือ A': {
-                    rounds: [
-                        {
-                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
-                            matches: [
-                                { id: 'M007', team1: 'เอก-ชัย', team2: 'กอล์ฟ-น็อต', status: 'pending', score1: '-', score2: '-' },
-                                { id: 'M008', team1: 'โกอ้วน-นีล', team2: 'ต้น+Alai', status: 'pending', score1: '-', score2: '-' }
-                            ]
-                        }
-                    ]
-                },
-                'มือ B': {
-                    rounds: [
-                        {
-                            title: 'รอบ 8 ทีม',
-                            matches: [
-                                { id: 'M023', team1: 'ดี-นัท', team2: 'ไปท์-มุก', status: 'completed', score1: '2', score2: '0' },
-                                { id: 'M024', team1: 'บิว-อาร์ท', team2: 'โรบิ้น-เอกมุ่ย', status: 'completed', score1: '2', score2: '1' },
-                                { id: 'M025', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
-                                { id: 'M026', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' }
-                            ]
-                        },
-                        {
-                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
-                            matches: [
-                                { id: 'M027', team1: 'ดี-นัท', team2: 'บิว-อาร์ท', status: 'pending', score1: '-', score2: '-' },
-                                { id: 'M028', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' }
-                            ]
-                        }
-                    ]
-                },
-                'มือ C-B': {
-                    rounds: [
-                        {
-                            title: 'รอบ 8 ทีม',
-                            matches: [
-                                { id: 'M059', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
-                                { id: 'M060', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
-                                { id: 'M061', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
-                                { id: 'M062', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' }
-                            ]
-                        },
-                        {
-                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
-                            matches: [
-                                { id: 'M063', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' },
-                                { id: 'M064', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' }
-                            ]
-                        }
-                    ]
-                },
-                'มือ C-C': {
-                    rounds: [
-                        {
-                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
-                            matches: [
-                                { id: 'M092', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' },
-                                { id: 'M093', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' }
-                            ]
-                        }
-                    ]
-                },
-                'มือ D': {
-                    rounds: [
-                        {
-                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
-                            matches: [
-                                { id: 'M116', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' },
-                                { id: 'M117', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' }
-                            ]
-                        }
-                    ]
-                },
-                'มือใหม่': {
-                    rounds: [
-                        {
-                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
-                            matches: [
-                                { id: 'M136', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' },
-                                { id: 'M137', team1: 'รอผลรอบแรก', team2: 'รอผลรอบแรก', status: 'pending', score1: '-', score2: '-' }
-                            ]
-                        }
-                    ]
-                },
-                'มือผสม': {
-                    rounds: [
-                        {
-                            title: 'รอบ 8 ทีม',
-                            matches: [
-                                { id: 'M152', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
-                                { id: 'M153', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
-                                { id: 'M154', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' },
-                                { id: 'M155', team1: 'รอจับฉลาก', team2: 'รอจับฉลาก', status: 'waiting_draw', score1: '-', score2: '-' }
-                            ]
-                        },
-                        {
-                            title: 'รอบ 4 ทีม (รองชนะเลิศ)',
-                            matches: [
-                                { id: 'M156', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' },
-                                { id: 'M157', team1: 'รอผลรอบ8ทีม', team2: 'รอผลรอบ8ทีม', status: 'pending', score1: '-', score2: '-' }
-                            ]
-                        }
-                    ]
-                }
-            };
-
             const data = knockoutData[category];
             if (!data) return '<div class="no-knockout">ไม่มีรอบน็อกเอาท์</div>';
 
@@ -922,49 +1148,18 @@
         }
 
         function generateFinalsMatches(category) {
-            const finalsData = {
-                'มือ A': {
-                    championship: { id: 'M009', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
-                    thirdPlace: { id: 'M010', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
-                },
-                'มือ B': {
-                    championship: { id: 'M029', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
-                    thirdPlace: { id: 'M030', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
-                },
-                'มือ C-B': {
-                    championship: { id: 'M065', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
-                    thirdPlace: { id: 'M066', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
-                },
-                'มือ C-C': {
-                    championship: { id: 'M094', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
-                    thirdPlace: { id: 'M095', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
-                },
-                'มือ D': {
-                    championship: { id: 'M118', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
-                    thirdPlace: { id: 'M119', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
-                },
-                'มือใหม่': {
-                    championship: { id: 'M138', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
-                    thirdPlace: { id: 'M139', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
-                },
-                'มือผสม': {
-                    championship: { id: 'M158', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' },
-                    thirdPlace: { id: 'M159', team1: 'รอผลรองชนะเลิศ', team2: 'รอผลรองชนะเลิศ', status: 'pending' }
-                }
-            };
-
             const data = finalsData[category];
             if (!data) return '<div class="no-finals">ไม่มีรอบชิงชนะเลิศ</div>';
 
             return `
                 <div class="final-match championship">
                     <div class="match-label">🏆 ชิงชนะเลิศ</div>
-                    ${generateMatchCard({...data.championship, score1: '-', score2: '-'})}
+                    ${generateMatchCard({...data.championship, score1: data.championship.score1 || '-', score2: data.championship.score2 || '-'})}
                 </div>
                 
                 <div class="final-match third-place">
                     <div class="match-label">🥉 ชิงอันดับ 3</div>
-                    ${generateMatchCard({...data.thirdPlace, score1: '-', score2: '-'})}
+                    ${generateMatchCard({...data.thirdPlace, score1: data.thirdPlace.score1 || '-', score2: data.thirdPlace.score2 || '-'})}
                 </div>
             `;
         }
@@ -1022,162 +1217,23 @@
                     { 
                         name: 'สาย 3', 
                         teams: [
-                            { name: 'พี่เหมี่ยว-อามอ', played: 3, wins: 2, points: 7, qualified: true },
-                            { name: 'เติ้ง-โจน', played: 3, wins: 2, points: 6, qualified: true },
-                            { name: 'ทอม-พี่หนุ่ม', played: 2, wins: 0, points: 0, qualified: false }
+                            { name: 'เติ้ง-โจน', played: 2, wins: 2, points: 6, qualified: true },
+                            { name: 'ทอม-พี่หนุ่ม', played: 2, wins: 1, points: 3, qualified: true },
+                            { name: 'พี่เหมี่ยว-อามอ', played: 2, wins: 0, points: 0, qualified: false }
                         ]
                     },
                     { 
                         name: 'สาย 4', 
                         teams: [
-                            { name: 'เอก-เตี้ย', played: 3, wins: 3, points: 9, qualified: true },
-                            { name: 'เพียว-พี่ตู้', played: 3, wins: 1, points: 4, qualified: true },
+                            { name: 'เอก-เตี้ย', played: 2, wins: 2, points: 6, qualified: true },
+                            { name: 'เพียว-พี่ตู้', played: 2, wins: 1, points: 3, qualified: true },
                             { name: 'โก้-แต้ม', played: 2, wins: 0, points: 0, qualified: false }
-                        ]
-                    }
-                ],
-                'มือ C-B': [
-                    { 
-                        name: 'สาย 1', 
-                        teams: [
-                            { name: 'บิว-ชัย', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'โจน-มาร์ค', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'แชมป์-เหน่ง', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'โรบิ้น-หยาง', played: 0, wins: 0, points: 0, qualified: false }
-                        ]
-                    },
-                    { 
-                        name: 'สาย 2', 
-                        teams: [
-                            { name: 'เตี้ย-อัพ', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'เพียว-เนส', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'ทอม-จิ๊บ', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'พฤกษ์-หนุ่ม', played: 0, wins: 0, points: 0, qualified: false }
-                        ]
-                    },
-                    { 
-                        name: 'สาย 3', 
-                        teams: [
-                            { name: 'สตีฟ-ฟลุ๊ค', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'แบงค์1000-โกกุ่ย', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'โกดุง-มุย', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'ชิ-พี่เอ๋', played: 0, wins: 0, points: 0, qualified: false }
-                        ]
-                    },
-                    { 
-                        name: 'สาย 4', 
-                        teams: [
-                            { name: 'อาร์ท-พี่อู๊ด', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'น็อต-พี่ต๋อม', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'พี่อั๋น-ครูเล็ก', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'โชค-โอม', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'ชิฟ-ฟ้า', played: 0, wins: 0, points: 0, qualified: false }
-                        ]
-                    }
-                ],
-                'มือ C-C': [
-                    { 
-                        name: 'สาย 1', 
-                        teams: [
-                            { name: 'อัพ-ชม', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'เจต-มาร์ค', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'หยาง-กวาง', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'นุช-ออย', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'หนึ่ง-ก๊อต', played: 0, wins: 0, points: 0, qualified: false }
-                        ]
-                    },
-                    { 
-                        name: 'สาย 2', 
-                        teams: [
-                            { name: 'ต๋อม-พี่กิ่ง', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'มุก-ต้อม', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'น้าพจน์-อั๋น', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'มิ้น-นิว', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'บี-สา', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'สตีฟ-พิม', played: 0, wins: 0, points: 0, qualified: false }
-                        ]
-                    }
-                ],
-                'มือ D': [
-                    { 
-                        name: 'สาย 1', 
-                        teams: [
-                            { name: 'แหม่ม-นาวา', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'โอ็ค-ไอซ์', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'มาร์ค-ลิฟ', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'กุ่ย-กานต์', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'แอร์-ชิน', played: 0, wins: 0, points: 0, qualified: false }
-                        ]
-                    },
-                    { 
-                        name: 'สาย 2', 
-                        teams: [
-                            { name: 'เช่-ฉัตร', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'บอล-ปาล์ม', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'กวาง-อิง', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'มุก-อาร์ม', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'ออม-นิว', played: 0, wins: 0, points: 0, qualified: false }
-                        ]
-                    }
-                ],
-                'มือใหม่': [
-                    { 
-                        name: 'สาย 1', 
-                        teams: [
-                            { name: 'อุ๊-ลูกชาย', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'โดนัท-แอร์', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'แอม-บอส', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'นิวเยียร์-แองกี้เบิร์ด', played: 0, wins: 0, points: 0, qualified: false }
-                        ]
-                    },
-                    { 
-                        name: 'สาย 2', 
-                        teams: [
-                            { name: 'ตุ๊กติ๊ก-มะปราง', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'กาน-มล', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'โกริน-น้านก', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'จำปูน-นิชา', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'ปุ้ย-รัก', played: 0, wins: 0, points: 0, qualified: false }
-                        ]
-                    }
-                ],
-                'มือผสม': [
-                    { 
-                        name: 'สาย 1', 
-                        teams: [
-                            { name: 'ชม-พี่ฮวด', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'เนส-บีม', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'นิกกี้-นิว', played: 0, wins: 0, points: 0, qualified: false }
-                        ]
-                    },
-                    { 
-                        name: 'สาย 2', 
-                        teams: [
-                            { name: 'แฟ้ม-มุก', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'ชิ-ฟาง', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'ชัย-คาเมล', played: 0, wins: 0, points: 0, qualified: false }
-                        ]
-                    },
-                    { 
-                        name: 'สาย 3', 
-                        teams: [
-                            { name: 'กิ่ง-กาย', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'โก้-ออม', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'วา-อาหมิง', played: 0, wins: 0, points: 0, qualified: false }
-                        ]
-                    },
-                    { 
-                        name: 'สาย 4', 
-                        teams: [
-                            { name: 'มล-นัท', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'เหว่ยฮั่น-ตุ๊กติ๊ก', played: 0, wins: 0, points: 0, qualified: false },
-                            { name: 'ป๊อป-ซัน', played: 0, wins: 0, points: 0, qualified: false }
                         ]
                     }
                 ]
             };
             
-            const categoryGroups = groups[category] || [{ name: 'สาย 1', teams: [{ name: 'ทีม A', played: 0, wins: 0, points: 0, qualified: false }] }];
+            const categoryGroups = groups[category] || [];
             
             return categoryGroups.map(group => `
                 <div class="group-card">
@@ -1219,7 +1275,7 @@
             if (password === '987') {
                 isAdminMode = true;
                 closeAdminModal();
-                alert('เข้าสู่ระบบ Admin สำเร็จ\n(ฟีเจอร์ Admin จะพัฒนาใน Part 4)');
+                alert('เข้าสู่ระบบ Admin สำเร็จ\\n(ฟีเจอร์ Admin จะพัฒนาใน Part 4)');
             } else {
                 alert('รหัสผ่านไม่ถูกต้อง');
                 document.getElementById('adminPassword').value = '';
