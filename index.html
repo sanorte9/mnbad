@@ -401,6 +401,72 @@
             flex: 1;
         }
 
+        .tab-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .tab-menu {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 16px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(0, 123, 255, 0.1);
+        }
+
+        .tab-btn.active {
+            background: white;
+            border-bottom-color: #007bff;
+            color: #007bff;
+        }
+
+        .tab-icon {
+            font-size: 20px;
+        }
+
+        .tab-text {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            padding: 0;
+        }
+
+        .tab-content-wrapper {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .final-match {
+            margin-bottom: 20px;
+        }
+
         .score-display {
             display: flex;
             align-items: center;
@@ -1002,6 +1068,9 @@
             const contentArea = document.getElementById('contentArea');
             const info = getCategoryInfo(category);
             
+            // สำหรับมือ A ใช้ฟังก์ชันพิเศษ
+            const matchesHTML = (category === 'มือ A') ? generateMueoAMatches() : generateRoundRobinMatches(category);
+            
             contentArea.innerHTML = `
                 <div class="bracket-container">
                     <div class="bracket-header">
@@ -1019,7 +1088,7 @@
                         </div>
                         <div class="round-robin-matches">
                             <h4 class="matches-section-title">รายการแมทรอบแรก</h4>
-                            ${generateRoundRobinMatches(category)}
+                            ${matchesHTML}
                         </div>
                     </div>
                     
@@ -1044,6 +1113,65 @@
                     </div>
                 </div>
             `;
+        }
+
+        function generateMueoAMatches() {
+            const matchData = [
+                {
+                    groupName: 'สาย 1',
+                    matches: [
+                        { id: 'M001', team1: 'เอก-ชัย', team2: 'โค้ทนัท-โกอ๊อต', set1_t1: 21, set1_t2: 15, set2_t1: 21, set2_t2: 18, status: 'completed' },
+                        { id: 'M002', team1: 'เอก-ชัย', team2: 'ต้น+Alai', set1_t1: 21, set1_t2: 18, set2_t1: 21, set2_t2: 16, status: 'completed' },
+                        { id: 'M003', team1: 'โค้ทนัท-โกอ๊อต', team2: 'ต้น+Alai', set1_t1: 16, set1_t2: 21, set2_t1: 19, set2_t2: 21, status: 'completed' }
+                    ]
+                },
+                {
+                    groupName: 'สาย 2',
+                    matches: [
+                        { id: 'M004', team1: 'เนส-ไปท์', team2: 'โกอ้วน-นีล', set1_t1: 12, set1_t2: 21, set2_t1: 18, set2_t2: 21, status: 'completed' },
+                        { id: 'M005', team1: 'เนส-ไปท์', team2: 'กอล์ฟ-น็อต', set1_t1: 18, set1_t2: 21, set2_t1: 20, set2_t2: 22, status: 'completed' },
+                        { id: 'M006', team1: 'โกอ้วน-นีล', team2: 'กอล์ฟ-น็อต', set1_t1: 21, set1_t2: 19, set2_t1: 21, set2_t2: 17, status: 'completed' }
+                    ]
+                }
+            ];
+
+            return matchData.map(group => `
+                <div class="group-matches">
+                    <div class="group-matches-title">${group.groupName}</div>
+                    ${group.matches.map(match => {
+                        const team1Sets = (match.set1_t1 > match.set1_t2 ? 1 : 0) + (match.set2_t1 > match.set2_t2 ? 1 : 0);
+                        const team2Sets = (match.set1_t2 > match.set1_t1 ? 1 : 0) + (match.set2_t2 > match.set2_t1 ? 1 : 0);
+                        
+                        return `
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header">
+                                    <span>${match.id}</span>
+                                    <span>เสร็จสิ้น</span>
+                                </div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team">
+                                        <span class="rr-team-name">${match.team1}</span>
+                                        <div class="score-display">
+                                            <span class="set-score ${match.set1_t1 > match.set1_t2 ? 'set-win' : ''}">${match.set1_t1}</span>
+                                            <span class="set-score ${match.set2_t1 > match.set2_t2 ? 'set-win' : ''}">${match.set2_t1}</span>
+                                            <span class="total-sets ${team1Sets > team2Sets ? 'match-win' : ''}">(${team1Sets})</span>
+                                        </div>
+                                    </div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team">
+                                        <span class="rr-team-name">${match.team2}</span>
+                                        <div class="score-display">
+                                            <span class="set-score ${match.set1_t2 > match.set1_t1 ? 'set-win' : ''}">${match.set1_t2}</span>
+                                            <span class="set-score ${match.set2_t2 > match.set2_t1 ? 'set-win' : ''}">${match.set2_t2}</span>
+                                            <span class="total-sets ${team2Sets > team1Sets ? 'match-win' : ''}">(${team2Sets})</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `).join('');
         }
 
         function getRoundRobinStatus(category) {
@@ -1148,6 +1276,91 @@
             const data = knockoutData[category];
             if (!data) return '<div class="no-knockout">ไม่มีรอบน็อกเอาท์</div>';
 
+            // ใช้ฟังก์ชันพิเศษสำหรับมือ A
+            if (category === 'มือ A') {
+                const semifinalMatches = [
+                    {
+                        id: 'M007',
+                        team1: 'เอก-ชัย',
+                        team2: 'กอล์ฟ-น็อต',
+                        set1_t1: 21, set1_t2: 18,
+                        set2_t1: 19, set2_t2: 21,
+                        set3_t1: 21, set3_t2: 16
+                    },
+                    {
+                        id: 'M008',
+                        team1: 'โกอ้วน-นีล',
+                        team2: 'ต้น+Alai',
+                        set1_t1: 21, set1_t2: 16,
+                        set2_t1: 18, set2_t2: 21,
+                        set3_t1: 21, set3_t2: 19
+                    }
+                ];
+
+                const createMueoAKnockoutCard = (match) => {
+                    let team1Sets = 0;
+                    let team2Sets = 0;
+                    
+                    // เซ็ต 1
+                    if (match.set1_t1 && match.set1_t2) {
+                        if (match.set1_t1 > match.set1_t2) team1Sets++;
+                        else team2Sets++;
+                    }
+                    
+                    // เซ็ต 2
+                    if (match.set2_t1 && match.set2_t2) {
+                        if (match.set2_t1 > match.set2_t2) team1Sets++;
+                        else team2Sets++;
+                    }
+                    
+                    // เซ็ต 3
+                    if (match.set3_t1 && match.set3_t2) {
+                        if (match.set3_t1 > match.set3_t2) team1Sets++;
+                        else team2Sets++;
+                    }
+
+                    return `
+                        <div class="match-card completed">
+                            <div class="match-header">
+                                <span>${match.id}</span>
+                                <span>เสร็จสิ้น</span>
+                            </div>
+                            <div class="match-teams">
+                                <div class="team">
+                                    <span class="team-name">${match.team1}</span>
+                                    <div class="score-display">
+                                        <span class="set-score ${match.set1_t1 > match.set1_t2 ? 'set-win' : ''}">${match.set1_t1}</span>
+                                        <span class="set-score ${match.set2_t1 > match.set2_t2 ? 'set-win' : ''}">${match.set2_t1}</span>
+                                        <span class="set-score ${match.set3_t1 > match.set3_t2 ? 'set-win' : ''}">${match.set3_t1}</span>
+                                        <span class="total-sets ${team1Sets > team2Sets ? 'match-win' : ''}">(${team1Sets})</span>
+                                    </div>
+                                </div>
+                                <div class="vs">VS</div>
+                                <div class="team">
+                                    <span class="team-name">${match.team2}</span>
+                                    <div class="score-display">
+                                        <span class="set-score ${match.set1_t2 > match.set1_t1 ? 'set-win' : ''}">${match.set1_t2}</span>
+                                        <span class="set-score ${match.set2_t2 > match.set2_t1 ? 'set-win' : ''}">${match.set2_t2}</span>
+                                        <span class="set-score ${match.set3_t2 > match.set3_t1 ? 'set-win' : ''}">${match.set3_t2}</span>
+                                        <span class="total-sets ${team2Sets > team1Sets ? 'match-win' : ''}">(${team2Sets})</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                };
+
+                return `
+                    <div class="round-section">
+                        <h4 class="round-title">รอบ 4 ทีม (รองชนะเลิศ)</h4>
+                        <div class="matches-grid">
+                            ${semifinalMatches.map(match => createMueoAKnockoutCard(match)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // ประเภทอื่น ๆ ใช้โค้ดเดิม
             return data.rounds.map(round => `
                 <div class="round-section">
                     <h4 class="round-title">${round.title}</h4>
@@ -1165,6 +1378,43 @@
             const statusText = match.status === 'waiting_draw' ? 'รอจับฉลาก' :
                               match.status === 'completed' ? 'เสร็จสิ้น' : 'รอการแข่งขัน';
 
+            let team1Display, team2Display;
+
+            if (match.status === 'completed' && match.set1_t1 !== undefined) {
+                // แสดง 3 เซ็ตสำหรับรอบน็อกเอาท์
+                const team1Sets = (match.set1_t1 > match.set1_t2 ? 1 : 0) + 
+                                 (match.set2_t1 > match.set2_t2 ? 1 : 0) + 
+                                 (match.set3_t1 > match.set3_t2 ? 1 : 0);
+                const team2Sets = (match.set1_t2 > match.set1_t1 ? 1 : 0) + 
+                                 (match.set2_t2 > match.set2_t1 ? 1 : 0) + 
+                                 (match.set3_t2 > match.set3_t1 ? 1 : 0);
+
+                team1Display = `
+                    <div class="score-display">
+                        <span class="set-score ${match.set1_t1 > match.set1_t2 ? 'set-win' : ''}">${match.set1_t1}</span>
+                        <span class="set-score ${match.set2_t1 > match.set2_t2 ? 'set-win' : ''}">${match.set2_t1}</span>
+                        <span class="set-score ${match.set3_t1 > match.set3_t2 ? 'set-win' : ''}">${match.set3_t1 || '-'}</span>
+                        <span class="total-sets ${team1Sets > team2Sets ? 'match-win' : ''}">(${team1Sets})</span>
+                    </div>
+                `;
+                team2Display = `
+                    <div class="score-display">
+                        <span class="set-score ${match.set1_t2 > match.set1_t1 ? 'set-win' : ''}">${match.set1_t2}</span>
+                        <span class="set-score ${match.set2_t2 > match.set2_t1 ? 'set-win' : ''}">${match.set2_t2}</span>
+                        <span class="set-score ${match.set3_t2 > match.set3_t1 ? 'set-win' : ''}">${match.set3_t2 || '-'}</span>
+                        <span class="total-sets ${team2Sets > team1Sets ? 'match-win' : ''}">(${team2Sets})</span>
+                    </div>
+                `;
+            } else if (match.status === 'completed') {
+                // แบบเก่า (เฉพาะตัวเลขเซ็ต)
+                team1Display = `<span class="team-score ${match.score1 > match.score2 ? 'winner' : ''}">${match.score1}</span>`;
+                team2Display = `<span class="team-score ${match.score2 > match.score1 ? 'winner' : ''}">${match.score2}</span>`;
+            } else {
+                // ยังไม่แข่งขัน
+                team1Display = '<span class="team-score">-</span>';
+                team2Display = '<span class="team-score">-</span>';
+            }
+
             return `
                 <div class="match-card ${statusClass}">
                     <div class="match-header">
@@ -1174,12 +1424,12 @@
                     <div class="match-teams">
                         <div class="team">
                             <span class="team-name">${match.team1}</span>
-                            <span class="team-score ${match.status === 'completed' && match.score1 > match.score2 ? 'winner' : ''}">${match.score1}</span>
+                            ${team1Display}
                         </div>
                         <div class="vs">VS</div>
                         <div class="team">
                             <span class="team-name">${match.team2}</span>
-                            <span class="team-score ${match.status === 'completed' && match.score2 > match.score1 ? 'winner' : ''}">${match.score2}</span>
+                            ${team2Display}
                         </div>
                     </div>
                 </div>
@@ -1190,6 +1440,95 @@
             const data = finalsData[category];
             if (!data) return '<div class="no-finals">ไม่มีรอบชิงชนะเลิศ</div>';
 
+            // ใช้ฟังก์ชันพิเศษสำหรับมือ A
+            if (category === 'มือ A') {
+                // ข้อมูลฮาร์ดโค้ดสำหรับมือ A
+                const championshipMatch = {
+                    id: 'M009',
+                    team1: 'เอก-ชัย',
+                    team2: 'โกอ้วน-นีล',
+                    set1_t1: 21, set1_t2: 19,
+                    set2_t1: 18, set2_t2: 21,
+                    set3_t1: 21, set3_t2: 17
+                };
+
+                const thirdPlaceMatch = {
+                    id: 'M010',
+                    team1: 'กอล์ฟ-น็อต',
+                    team2: 'ต้น+Alai',
+                    set1_t1: 21, set1_t2: 16,
+                    set2_t1: 21, set2_t2: 19,
+                    set3_t1: null, set3_t2: null
+                };
+
+                const createMueoAFinalCard = (match) => {
+                    // ตรวจสอบและคำนวณจำนวนเซ็ตที่ชนะ
+                    let team1Sets = 0;
+                    let team2Sets = 0;
+                    
+                    // เซ็ต 1
+                    if (match.set1_t1 && match.set1_t2) {
+                        if (match.set1_t1 > match.set1_t2) team1Sets++;
+                        else team2Sets++;
+                    }
+                    
+                    // เซ็ต 2
+                    if (match.set2_t1 && match.set2_t2) {
+                        if (match.set2_t1 > match.set2_t2) team1Sets++;
+                        else team2Sets++;
+                    }
+                    
+                    // เซ็ต 3 (ถ้ามี)
+                    if (match.set3_t1 && match.set3_t2) {
+                        if (match.set3_t1 > match.set3_t2) team1Sets++;
+                        else team2Sets++;
+                    }
+
+                    return `
+                        <div class="match-card completed">
+                            <div class="match-header">
+                                <span>${match.id}</span>
+                                <span>เสร็จสิ้น</span>
+                            </div>
+                            <div class="match-teams">
+                                <div class="team">
+                                    <span class="team-name">${match.team1}</span>
+                                    <div class="score-display">
+                                        <span class="set-score ${match.set1_t1 && match.set1_t2 && match.set1_t1 > match.set1_t2 ? 'set-win' : ''}">${match.set1_t1 || '-'}</span>
+                                        <span class="set-score ${match.set2_t1 && match.set2_t2 && match.set2_t1 > match.set2_t2 ? 'set-win' : ''}">${match.set2_t1 || '-'}</span>
+                                        <span class="set-score ${match.set3_t1 && match.set3_t2 && match.set3_t1 > match.set3_t2 ? 'set-win' : ''}">${match.set3_t1 || '-'}</span>
+                                        <span class="total-sets ${team1Sets > team2Sets ? 'match-win' : ''}">(${team1Sets})</span>
+                                    </div>
+                                </div>
+                                <div class="vs">VS</div>
+                                <div class="team">
+                                    <span class="team-name">${match.team2}</span>
+                                    <div class="score-display">
+                                        <span class="set-score ${match.set1_t2 && match.set1_t1 && match.set1_t2 > match.set1_t1 ? 'set-win' : ''}">${match.set1_t2 || '-'}</span>
+                                        <span class="set-score ${match.set2_t2 && match.set2_t1 && match.set2_t2 > match.set2_t1 ? 'set-win' : ''}">${match.set2_t2 || '-'}</span>
+                                        <span class="set-score ${match.set3_t2 && match.set3_t1 && match.set3_t2 > match.set3_t1 ? 'set-win' : ''}">${match.set3_t2 || '-'}</span>
+                                        <span class="total-sets ${team2Sets > team1Sets ? 'match-win' : ''}">(${team2Sets})</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                };
+
+                return `
+                    <div class="final-match championship">
+                        <div class="match-label">🏆 ชิงชนะเลิศ</div>
+                        ${createMueoAFinalCard(championshipMatch)}
+                    </div>
+                    
+                    <div class="final-match third-place">
+                        <div class="match-label">🥉 ชิงอันดับ 3</div>
+                        ${createMueoAFinalCard(thirdPlaceMatch)}
+                    </div>
+                `;
+            }
+
+            // ประเภทอื่น ๆ ใช้โค้ดเดิม
             return `
                 <div class="final-match championship">
                     <div class="match-label">🏆 ชิงชนะเลิศ</div>
