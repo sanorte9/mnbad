@@ -479,6 +479,10 @@
             border-color: #28a745;
         }
 
+        .match-card.pending {
+            border-color: #ffc107;
+        }
+
         .match-header {
             background: #f8f9fa;
             padding: 8px 15px;
@@ -509,9 +513,18 @@
             border-bottom: none;
         }
 
-        .team-name {
-            font-size: 14px;
-            color: #333;
+        .team-score {
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .team-score.winner {
+            background: #d4edda;
+            color: #155724;
         }
 
         .vs {
@@ -646,43 +659,43 @@
         <div class="nav-container">
             <div class="nav-title">เลือกประเภทการแข่งขัน</div>
             <div class="category-grid">
-                <div class="category-btn" onclick="selectCategory('มือ A')">
+                <div class="category-btn" onclick="loadCategory('A')">
                     <div class="category-name">มือ A</div>
                     <div class="category-info">6 ทีม • 2 สาย</div>
                     <div class="status-badge">6</div>
                 </div>
                 
-                <div class="category-btn" onclick="selectCategory('มือ B')">
+                <div class="category-btn" onclick="loadCategory('B')">
                     <div class="category-name">มือ B</div>
                     <div class="category-info">12 ทีม • 4 สาย</div>
                     <div class="status-badge">12</div>
                 </div>
                 
-                <div class="category-btn" onclick="selectCategory('มือ C-B')">
+                <div class="category-btn" onclick="loadCategory('C-B')">
                     <div class="category-name">มือ C-B</div>
                     <div class="category-info">17 ทีม • 4 สาย</div>
                     <div class="status-badge">17</div>
                 </div>
                 
-                <div class="category-btn" onclick="selectCategory('มือ C-C')">
+                <div class="category-btn" onclick="loadCategory('C-C')">
                     <div class="category-name">มือ C-C</div>
                     <div class="category-info">11 ทีม • 2 สาย</div>
                     <div class="status-badge">11</div>
                 </div>
                 
-                <div class="category-btn" onclick="selectCategory('มือ D')">
+                <div class="category-btn" onclick="loadCategory('D')">
                     <div class="category-name">มือ D</div>
                     <div class="category-info">10 ทีม • 2 สาย</div>
                     <div class="status-badge">10</div>
                 </div>
                 
-                <div class="category-btn" onclick="selectCategory('มือใหม่')">
+                <div class="category-btn" onclick="loadCategory('ใหม่')">
                     <div class="category-name">มือใหม่</div>
                     <div class="category-info">9 ทีม • 2 สาย</div>
                     <div class="status-badge">9</div>
                 </div>
                 
-                <div class="category-btn" onclick="selectCategory('มือผสม')" style="grid-column: 1 / -1;">
+                <div class="category-btn" onclick="loadCategory('ผสม')" style="grid-column: 1 / -1;">
                     <div class="category-name">มือผสม</div>
                     <div class="category-info">12 ทีม • 4 สาย</div>
                     <div class="status-badge">12</div>
@@ -722,508 +735,533 @@
         let currentCategory = null;
         let isAdminMode = false;
 
-        // ฟังก์ชันสำหรับเนื้อหาแท็บมือ A
-        function getMueoARoundRobinContent() {
-            return '<div class="groups-container">' +
-                '<div class="group-card">' +
-                '<div class="group-title">สาย 1</div>' +
-                '<div class="standings-table">' +
-                '<div class="table-header">' +
-                '<span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>คะแนน</span>' +
-                '</div>' +
-                '<div class="team-row qualified"><span class="rank">1</span><span class="team-name">เอก-ชัย</span><span>2</span><span>2</span><span class="points">6</span></div>' +
-                '<div class="team-row qualified"><span class="rank">2</span><span class="team-name">ต้น+Alai</span><span>2</span><span>1</span><span class="points">3</span></div>' +
-                '<div class="team-row"><span class="rank">3</span><span class="team-name">โค้ทนัท-โกอ๊อต</span><span>2</span><span>0</span><span class="points">0</span></div>' +
-                '</div></div>' +
-                '<div class="group-card">' +
-                '<div class="group-title">สาย 2</div>' +
-                '<div class="standings-table">' +
-                '<div class="table-header">' +
-                '<span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>คะแนน</span>' +
-                '</div>' +
-                '<div class="team-row qualified"><span class="rank">1</span><span class="team-name">โกอ้วน-นีล</span><span>2</span><span>2</span><span class="points">6</span></div>' +
-                '<div class="team-row qualified"><span class="rank">2</span><span class="team-name">กอล์ฟ-น็อต</span><span>2</span><span>1</span><span class="points">3</span></div>' +
-                '<div class="team-row"><span class="rank">3</span><span class="team-name">เนส-ไปท์</span><span>2</span><span>0</span><span class="points">0</span></div>' +
-                '</div></div>' +
-                '</div>' +
-                '<div class="round-robin-matches">' +
-                '<h4 class="matches-section-title">รายการแมทรอบแรก</h4>' +
-                '<div class="group-matches">' +
-                '<div class="group-matches-title">สาย 1</div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M001</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">เอก-ชัย</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">โค้ทนัท-โกอ๊อต</span>' +
-                '<div class="score-display"><span class="set-score">15</span><span class="set-score">18</span><span class="total-sets">(0)</span></div></div>' +
-                '</div></div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M002</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">เอก-ชัย</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">ต้น+Alai</span>' +
-                '<div class="score-display"><span class="set-score">18</span><span class="set-score">16</span><span class="total-sets">(0)</span></div></div>' +
-                '</div></div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M003</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">โค้ทนัท-โกอ๊อต</span>' +
-                '<div class="score-display"><span class="set-score">16</span><span class="set-score">19</span><span class="total-sets">(0)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">ต้น+Alai</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '</div></div>' +
-                '</div>' +
-                '<div class="group-matches">' +
-                '<div class="group-matches-title">สาย 2</div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M004</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">เนส-ไปท์</span>' +
-                '<div class="score-display"><span class="set-score">12</span><span class="set-score">18</span><span class="total-sets">(0)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">โกอ้วน-นีล</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '</div></div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M005</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">เนส-ไปท์</span>' +
-                '<div class="score-display"><span class="set-score">18</span><span class="set-score">20</span><span class="total-sets">(0)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">กอล์ฟ-น็อต</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">22</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '</div></div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M006</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">โกอ้วน-นีล</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">กอล์ฟ-น็อต</span>' +
-                '<div class="score-display"><span class="set-score">19</span><span class="set-score">17</span><span class="total-sets">(0)</span></div></div>' +
-                '</div></div>' +
-                '</div>' +
-                '</div>';
-        }
-
-        function getMueoAKnockoutContent() {
-            return '<div class="knockout-section">' +
-                '<h4 class="section-title">รอบ 4 ทีม (รองชนะเลิศ)</h4>' +
-                '<div class="matches-grid">' +
-                '<div class="match-card completed">' +
-                '<div class="match-header"><span>M007</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="match-teams">' +
-                '<div class="team"><span class="team-name">เอก-ชัย</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score">19</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="vs">VS</div>' +
-                '<div class="team"><span class="team-name">กอล์ฟ-น็อต</span>' +
-                '<div class="score-display"><span class="set-score">18</span><span class="set-score set-win">21</span><span class="set-score">16</span><span class="total-sets">(1)</span></div></div>' +
-                '</div></div>' +
-                '<div class="match-card completed">' +
-                '<div class="match-header"><span>M008</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="match-teams">' +
-                '<div class="team"><span class="team-name">โกอ้วน-นีล</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score">18</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="vs">VS</div>' +
-                '<div class="team"><span class="team-name">ต้น+Alai</span>' +
-                '<div class="score-display"><span class="set-score">16</span><span class="set-score set-win">21</span><span class="set-score">19</span><span class="total-sets">(1)</span></div></div>' +
-                '</div></div>' +
-                '</div></div>';
-        }
-
-        function getMueoAFinalsContent() {
-            return '<div class="finals-section">' +
-                '<div class="final-match championship">' +
-                '<div class="match-label">🏆 ชิงชนะเลิศ</div>' +
-                '<div class="match-card completed">' +
-                '<div class="match-header"><span>M009</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="match-teams">' +
-                '<div class="team"><span class="team-name">เอก-ชัย</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score">18</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="vs">VS</div>' +
-                '<div class="team"><span class="team-name">โกอ้วน-นีล</span>' +
-                '<div class="score-display"><span class="set-score">19</span><span class="set-score set-win">21</span><span class="set-score">17</span><span class="total-sets">(1)</span></div></div>' +
-                '</div></div>' +
-                '</div>' +
-                '<div class="final-match third-place">' +
-                '<div class="match-label">🥉 ชิงอันดับ 3</div>' +
-                '<div class="match-card completed">' +
-                '<div class="match-header"><span>M010</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="match-teams">' +
-                '<div class="team"><span class="team-name">กอล์ฟ-น็อต</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="set-score">-</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="vs">VS</div>' +
-                '<div class="team"><span class="team-name">ต้น+Alai</span>' +
-                '<div class="score-display"><span class="set-score">16</span><span class="set-score">19</span><span class="set-score">-</span><span class="total-sets">(0)</span></div></div>' +
-                '</div></div>' +
-                '</div>' +
-                '</div>';
-        }
-
-        // ฟังก์ชันสำหรับเนื้อหาแท็บมือ B
-        function getMueoBRoundRobinContent() {
-            return '<div class="groups-container">' +
-                '<div class="group-card">' +
-                '<div class="group-title">สาย 1</div>' +
-                '<div class="standings-table">' +
-                '<div class="table-header">' +
-                '<span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>คะแนน</span>' +
-                '</div>' +
-                '<div class="team-row qualified"><span class="rank">1</span><span class="team-name">ดี-นัท</span><span>2</span><span>2</span><span class="points">6</span></div>' +
-                '<div class="team-row qualified"><span class="rank">2</span><span class="team-name">โรบิ้น-เอกมุ่ย</span><span>2</span><span>1</span><span class="points">3</span></div>' +
-                '<div class="team-row"><span class="rank">3</span><span class="team-name">ชัย-แบงค์ 1000</span><span>2</span><span>0</span><span class="points">0</span></div>' +
-                '</div></div>' +
-                '<div class="group-card">' +
-                '<div class="group-title">สาย 2</div>' +
-                '<div class="standings-table">' +
-                '<div class="table-header">' +
-                '<span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>คะแนน</span>' +
-                '</div>' +
-                '<div class="team-row qualified"><span class="rank">1</span><span class="team-name">บิว-อาร์ท</span><span>2</span><span>2</span><span class="points">6</span></div>' +
-                '<div class="team-row qualified"><span class="rank">2</span><span class="team-name">ไปท์-มุก</span><span>2</span><span>1</span><span class="points">3</span></div>' +
-                '<div class="team-row"><span class="rank">3</span><span class="team-name">โค้ทนัท-บีม</span><span>2</span><span>0</span><span class="points">0</span></div>' +
-                '</div></div>' +
-                '<div class="group-card">' +
-                '<div class="group-title">สาย 3</div>' +
-                '<div class="standings-table">' +
-                '<div class="table-header">' +
-                '<span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>คะแนน</span>' +
-                '</div>' +
-                '<div class="team-row qualified"><span class="rank">1</span><span class="team-name">เติ้ง-โจน</span><span>2</span><span>2</span><span class="points">6</span></div>' +
-                '<div class="team-row qualified"><span class="rank">2</span><span class="team-name">ทอม-พี่หนุ่ม</span><span>2</span><span>1</span><span class="points">3</span></div>' +
-                '<div class="team-row"><span class="rank">3</span><span class="team-name">พี่เหมี่ยว-อามอ</span><span>2</span><span>0</span><span class="points">0</span></div>' +
-                '</div></div>' +
-                '<div class="group-card">' +
-                '<div class="group-title">สาย 4</div>' +
-                '<div class="standings-table">' +
-                '<div class="table-header">' +
-                '<span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>คะแนน</span>' +
-                '</div>' +
-                '<div class="team-row qualified"><span class="rank">1</span><span class="team-name">เอก-เตี้ย</span><span>2</span><span>2</span><span class="points">6</span></div>' +
-                '<div class="team-row qualified"><span class="rank">2</span><span class="team-name">เพียว-พี่ตู้</span><span>2</span><span>1</span><span class="points">3</span></div>' +
-                '<div class="team-row"><span class="rank">3</span><span class="team-name">โก้-แต้ม</span><span>2</span><span>0</span><span class="points">0</span></div>' +
-                '</div></div>' +
-                '</div>' +
-                '<div class="round-robin-matches">' +
-                '<h4 class="matches-section-title">รายการแมทรอบแรก</h4>' +
-                '<div class="group-matches">' +
-                '<div class="group-matches-title">สาย 1</div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M011</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">ดี-นัท</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">โรบิ้น-เอกมุ่ย</span>' +
-                '<div class="score-display"><span class="set-score">17</span><span class="set-score">19</span><span class="total-sets">(0)</span></div></div>' +
-                '</div></div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M012</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">ดี-นัท</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">ชัย-แบงค์ 1000</span>' +
-                '<div class="score-display"><span class="set-score">14</span><span class="set-score">16</span><span class="total-sets">(0)</span></div></div>' +
-                '</div></div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M013</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">โรบิ้น-เอกมุ่ย</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">ชัย-แบงค์ 1000</span>' +
-                '<div class="score-display"><span class="set-score">16</span><span class="set-score">18</span><span class="total-sets">(0)</span></div></div>' +
-                '</div></div>' +
-                '</div>' +
-                '<div class="group-matches">' +
-                '<div class="group-matches-title">สาย 2</div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M014</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">โค้ทนัท-บีม</span>' +
-                '<div class="score-display"><span class="set-score">15</span><span class="set-score">17</span><span class="total-sets">(0)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">บิว-อาร์ท</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '</div></div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M015</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">โค้ทนัท-บีม</span>' +
-                '<div class="score-display"><span class="set-score">18</span><span class="set-score">20</span><span class="total-sets">(0)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">ไปท์-มุก</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">22</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '</div></div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M016</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">บิว-อาร์ท</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">ไปท์-มุก</span>' +
-                '<div class="score-display"><span class="set-score">19</span><span class="set-score">17</span><span class="total-sets">(0)</span></div></div>' +
-                '</div></div>' +
-                '</div>' +
-                '<div class="group-matches">' +
-                '<div class="group-matches-title">สาย 3</div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M017</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">พี่เหมี่ยว-อามอ</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score">18</span><span class="total-sets">(1)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">เติ้ง-โจน</span>' +
-                '<div class="score-display"><span class="set-score">19</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '</div></div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M018</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">พี่เหมี่ยว-อามอ</span>' +
-                '<div class="score-display"><span class="set-score">19</span><span class="set-score">16</span><span class="total-sets">(0)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">ทอม-พี่หนุ่ม</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '</div></div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M019</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">เติ้ง-โจน</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">ทอม-พี่หนุ่ม</span>' +
-                '<div class="score-display"><span class="set-score">16</span><span class="set-score">18</span><span class="total-sets">(0)</span></div></div>' +
-                '</div></div>' +
-                '</div>' +
-                '<div class="group-matches">' +
-                '<div class="group-matches-title">สาย 4</div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M020</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">เอก-เตี้ย</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">เพียว-พี่ตู้</span>' +
-                '<div class="score-display"><span class="set-score">18</span><span class="set-score">16</span><span class="total-sets">(0)</span></div></div>' +
-                '</div></div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M021</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">เอก-เตี้ย</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">โก้-แต้ม</span>' +
-                '<div class="score-display"><span class="set-score">15</span><span class="set-score">17</span><span class="total-sets">(0)</span></div></div>' +
-                '</div></div>' +
-                '<div class="round-robin-match-card completed">' +
-                '<div class="rr-match-header"><span>M022</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="rr-match-teams">' +
-                '<div class="rr-team"><span class="rr-team-name">เพียว-พี่ตู้</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="rr-vs">VS</div>' +
-                '<div class="rr-team"><span class="rr-team-name">โก้-แต้ม</span>' +
-                '<div class="score-display"><span class="set-score">17</span><span class="set-score">15</span><span class="total-sets">(0)</span></div></div>' +
-                '</div></div>' +
-                '</div>' +
-                '</div>';
-        }
-
-        function getMueoBKnockoutContent() {
-            return '<div class="knockout-section">' +
-                '<h4 class="section-title">รอบ 8 ทีม</h4>' +
-                '<div class="matches-grid">' +
-                '<div class="match-card completed">' +
-                '<div class="match-header"><span>M023</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="match-teams">' +
-                '<div class="team"><span class="team-name">ดี-นัท</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score">18</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="vs">VS</div>' +
-                '<div class="team"><span class="team-name">ไปท์-มุก</span>' +
-                '<div class="score-display"><span class="set-score">16</span><span class="set-score set-win">21</span><span class="set-score">19</span><span class="total-sets">(1)</span></div></div>' +
-                '</div></div>' +
-                '<div class="match-card completed">' +
-                '<div class="match-header"><span>M024</span><span>เสร็จสิ้น</span></div>' +
-                '<div class="match-teams">' +
-                '<div class="team"><span class="team-name">บิว-อาร์ท</span>' +
-                '<div class="score-display"><span class="set-score set-win">21</span><span class="set-score">17</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>' +
-                '<div class="vs">VS</div>' +
-                '<div class="team"><span class="team-name">โรบิ้น-เอกมุ่ย</span>' +
-                '<div class="score-display"><span class="set-score">19</span><span class="set-score set-win">21</span><span class="set-score">18</span><span class="total-sets">(1)</span></div></div>' +
-                '</div></div>' +
-                '<div class="match-card pending">' +
-                '<div class="match-header"><span>M025</span><span>รอการแข่งขัน</span></div>' +
-                '<div class="match-teams">' +
-                '<div class="team"><span class="team-name">เติ้ง-โจน</span><span class="team-score">-</span></div>' +
-                '<div class="vs">VS</div>' +
-                '<div class="team"><span class="team-name">เพียว-พี่ตู้</span><span class="team-score">-</span></div>' +
-                '</div></div>' +
-                '<div class="match-card pending">' +
-                '<div class="match-header"><span>M026</span><span>รอการแข่งขัน</span></div>' +
-                '<div class="match-teams">' +
-                '<div class="team"><span class="team-name">เอก-เตี้ย</span><span class="team-score">-</span></div>' +
-                '<div class="vs">VS</div>' +
-                '<div class="team"><span class="team-name">ทอม-พี่หนุ่ม</span><span class="team-score">-</span></div>' +
-                '</div></div>' +
-                '</div>' +
-                '<h4 class="section-title">รอบ 4 ทีม (รองชนะเลิศ)</h4>' +
-                '<div class="matches-grid">' +
-                '<div class="match-card pending">' +
-                '<div class="match-header"><span>M027</span><span>รอการแข่งขัน</span></div>' +
-                '<div class="match-teams">' +
-                '<div class="team"><span class="team-name">ดี-นัท</span><span class="team-score">-</span></div>' +
-                '<div class="vs">VS</div>' +
-                '<div class="team"><span class="team-name">บิว-อาร์ท</span><span class="team-score">-</span></div>' +
-                '</div></div>' +
-                '<div class="match-card pending">' +
-                '<div class="match-header"><span>M028</span><span>รอการแข่งขัน</span></div>' +
-                '<div class="match-teams">' +
-                '<div class="team"><span class="team-name">รอผลรอบ8ทีม</span><span class="team-score">-</span></div>' +
-                '<div class="vs">VS</div>' +
-                '<div class="team"><span class="team-name">รอผลรอบ8ทีม</span><span class="team-score">-</span></div>' +
-                '</div></div>' +
-                '</div>' +
-                '</div>';
-        }
-
-        function getMueoBFinalsContent() {
-            return '<div class="finals-section">' +
-                '<div class="final-match championship">' +
-                '<div class="match-label">🏆 ชิงชนะเลิศ</div>' +
-                '<div class="match-card pending">' +
-                '<div class="match-header"><span>M029</span><span>รอผลรองชนะเลิศ</span></div>' +
-                '<div class="match-teams">' +
-                '<div class="team"><span class="team-name">รอผลรองชนะเลิศ</span><span class="team-score">-</span></div>' +
-                '<div class="vs">VS</div>' +
-                '<div class="team"><span class="team-name">รอผลรองชนะเลิศ</span><span class="team-score">-</span></div>' +
-                '</div></div>' +
-                '</div>' +
-                '<div class="final-match third-place">' +
-                '<div class="match-label">🥉 ชิงอันดับ 3</div>' +
-                '<div class="match-card pending">' +
-                '<div class="match-header"><span>M030</span><span>รอผลรองชนะเลิศ</span></div>' +
-                '<div class="match-teams">' +
-                '<div class="team"><span class="team-name">รอผลรองชนะเลิศ</span><span class="team-score">-</span></div>' +
-                '<div class="vs">VS</div>' +
-                '<div class="team"><span class="team-name">รอผลรองชนะเลิศ</span><span class="team-score">-</span></div>' +
-                '</div></div>' +
-                '</div>' +
-                '</div>';
-        }
-
-        function selectCategory(category) {
+        function loadCategory(cat) {
             document.querySelectorAll('.category-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             
             event.target.closest('.category-btn').classList.add('active');
-            currentCategory = category;
+            currentCategory = cat;
             
             const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>กำลังโหลดข้อมูล...</div></div>';
             
-            // สำหรับมือ A โหลดแท็บทันที
-            if (category === 'มือ A') {
-                contentArea.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>กำลังโหลดข้อมูล มือ A...</div></div>';
-                
-                setTimeout(function() {
-                    try {
-                        const html = '<div class="bracket-container">' +
-                            '<div class="bracket-header">' +
-                            '<h2 class="bracket-title">มือ A</h2>' +
-                            '<div class="bracket-stats">6 ทีม • 2 สาย • 10 แมท</div>' +
-                            '</div>' +
-                            '<div class="tabs-container">' +
-                            '<div class="tabs-nav">' +
-                            '<button class="tab-btn active" data-tab="round-robin">📋 รอบแรก</button>' +
-                            '<button class="tab-btn" data-tab="knockout">⚔️ รอบน็อกเอาท์</button>' +
-                            '<button class="tab-btn" data-tab="finals">🏆 ชิงชนะเลิศ</button>' +
-                            '</div>' +
-                            '<div class="tab-content" id="mueoATabContent">' +
-                            getMueoARoundRobinContent() +
-                            '</div>' +
-                            '</div>' +
-                            '</div>';
-                        contentArea.innerHTML = html;
-                        
-                        // เพิ่ม event listeners หลังจากสร้าง HTML เสร็จ
-                        addMueoATabListeners();
-                        
-                    } catch (error) {
-                        contentArea.innerHTML = '<div style="padding: 20px; color: red;">เกิดข้อผิดพลาด: ' + error.message + '</div>';
-                    }
-                }, 300);
-                return;
-            }
-            
-            // ประเภทอื่นแสดงข้อความ Coming Soon
+            setTimeout(() => {
+                if (cat === 'A') {
+                    showMueoA();
+                } else if (cat === 'B') {
+                    showMueoB();
+                } else {
+                    showComingSoon(cat);
+                }
+            }, 500);
+        }
+
+        function showMueoA() {
+            const contentArea = document.getElementById('contentArea');
             contentArea.innerHTML = `
-                <div class="welcome-screen">
-                    <div class="welcome-icon">🏸</div>
-                    <div class="welcome-title">${category}</div>
-                    <div class="welcome-text">
-                        ข้อมูลประเภท ${category} จะพัฒนาในขั้นตอนถัดไป
-                        <br><br>
-                        ปัจจุบันมีเฉพาะ "มือ A" เท่านั้นที่พร้อมใช้งาน
+                <div class="bracket-container">
+                    <div class="bracket-header">
+                        <h2 class="bracket-title">มือ A</h2>
+                        <div class="bracket-stats">6 ทีม • 2 สาย • 10 แมท</div>
+                    </div>
+                    <div class="tabs-container">
+                        <div class="tabs-nav">
+                            <button class="tab-btn active" onclick="switchTab('A', 'round-robin')">📋 รอบแรก</button>
+                            <button class="tab-btn" onclick="switchTab('A', 'knockout')">⚔️ รอบน็อกเอาท์</button>
+                            <button class="tab-btn" onclick="switchTab('A', 'finals')">🏆 ชิงชนะเลิศ</button>
+                        </div>
+                        <div class="tab-content" id="tabContent">
+                            ${getContentA('round-robin')}
+                        </div>
                     </div>
                 </div>
             `;
         }
 
-        function addMueoATabListeners() {
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            tabButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const tabName = this.getAttribute('data-tab');
-                    
-                    // ลบ active จากทุกแท็บ
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    
-                    // เพิ่ม active ให้แท็บที่คลิก
-                    this.classList.add('active');
-                    
-                    // เปลี่ยนเนื้อหา
-                    const tabContent = document.getElementById('mueoATabContent');
-                    
-                    if (tabName === 'round-robin') {
-                        tabContent.innerHTML = getMueoARoundRobinContent();
-                    } else if (tabName === 'knockout') {
-                        tabContent.innerHTML = getMueoAKnockoutContent();
-                    } else if (tabName === 'finals') {
-                        tabContent.innerHTML = getMueoAFinalsContent();
-                    }
-                });
-            });
+        function showMueoB() {
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = `
+                <div class="bracket-container">
+                    <div class="bracket-header">
+                        <h2 class="bracket-title">มือ B</h2>
+                        <div class="bracket-stats">12 ทีม • 4 สาย • 30 แมท</div>
+                    </div>
+                    <div class="tabs-container">
+                        <div class="tabs-nav">
+                            <button class="tab-btn active" onclick="switchTab('B', 'round-robin')">📋 รอบแรก</button>
+                            <button class="tab-btn" onclick="switchTab('B', 'knockout')">⚔️ รอบน็อกเอาท์</button>
+                            <button class="tab-btn" onclick="switchTab('B', 'finals')">🏆 ชิงชนะเลิศ</button>
+                        </div>
+                        <div class="tab-content" id="tabContent">
+                            ${getContentB('round-robin')}
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
-        function addMueoBTabListeners() {
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            tabButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const tabName = this.getAttribute('data-tab');
-                    
-                    // ลบ active จากทุกแท็บ
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    
-                    // เพิ่ม active ให้แท็บที่คลิก
-                    this.classList.add('active');
-                    
-                    // เปลี่ยนเนื้อหา
-                    const tabContent = document.getElementById('mueoBTabContent');
-                    
-                    if (tabName === 'round-robin') {
-                        tabContent.innerHTML = getMueoBRoundRobinContent();
-                    } else if (tabName === 'knockout') {
-                        tabContent.innerHTML = getMueoBKnockoutContent();
-                    } else if (tabName === 'finals') {
-                        tabContent.innerHTML = getMueoBFinalsContent();
-                    }
-                });
+        function showComingSoon(cat) {
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = `
+                <div class="welcome-screen">
+                    <div class="welcome-icon">🏸</div>
+                    <div class="welcome-title">มือ ${cat}</div>
+                    <div class="welcome-text">
+                        ข้อมูลประเภทนี้จะพัฒนาในขั้นตอนถัดไป
+                        <br><br>
+                        ปัจจุบันมี "มือ A" และ "มือ B" เท่านั้นที่พร้อมใช้งาน
+                    </div>
+                </div>
+            `;
+        }
+
+        function switchTab(category, tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
             });
+            
+            event.target.classList.add('active');
+            
+            const tabContent = document.getElementById('tabContent');
+            if (category === 'A') {
+                tabContent.innerHTML = getContentA(tab);
+            } else if (category === 'B') {
+                tabContent.innerHTML = getContentB(tab);
+            }
+        }
+
+        function getContentA(tab) {
+            if (tab === 'round-robin') {
+                return `
+                    <div class="groups-container">
+                        <div class="group-card">
+                            <div class="group-title">สาย 1</div>
+                            <div class="standings-table">
+                                <div class="table-header">
+                                    <span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>คะแนน</span>
+                                </div>
+                                <div class="team-row qualified"><span class="rank">1</span><span class="team-name">เอก-ชัย</span><span>2</span><span>2</span><span class="points">6</span></div>
+                                <div class="team-row qualified"><span class="rank">2</span><span class="team-name">ต้น+Alai</span><span>2</span><span>1</span><span class="points">3</span></div>
+                                <div class="team-row"><span class="rank">3</span><span class="team-name">โค้ทนัท-โกอ๊อต</span><span>2</span><span>0</span><span class="points">0</span></div>
+                            </div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">สาย 2</div>
+                            <div class="standings-table">
+                                <div class="table-header">
+                                    <span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>คะแนน</span>
+                                </div>
+                                <div class="team-row qualified"><span class="rank">1</span><span class="team-name">โกอ้วน-นีล</span><span>2</span><span>2</span><span class="points">6</span></div>
+                                <div class="team-row qualified"><span class="rank">2</span><span class="team-name">กอล์ฟ-น็อต</span><span>2</span><span>1</span><span class="points">3</span></div>
+                                <div class="team-row"><span class="rank">3</span><span class="team-name">เนส-ไปท์</span><span>2</span><span>0</span><span class="points">0</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="round-robin-matches">
+                        <h4 class="matches-section-title">รายการแมทรอบแรก</h4>
+                        <div class="group-matches">
+                            <div class="group-matches-title">สาย 1</div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M001</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">เอก-ชัย</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">โค้ทนัท-โกอ๊อต</span>
+                                    <div class="score-display"><span class="set-score">15</span><span class="set-score">18</span><span class="total-sets">(0)</span></div></div>
+                                </div>
+                            </div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M002</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">เอก-ชัย</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">ต้น+Alai</span>
+                                    <div class="score-display"><span class="set-score">18</span><span class="set-score">16</span><span class="total-sets">(0)</span></div></div>
+                                </div>
+                            </div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M003</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">โค้ทนัท-โกอ๊อต</span>
+                                    <div class="score-display"><span class="set-score">16</span><span class="set-score">19</span><span class="total-sets">(0)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">ต้น+Alai</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="group-matches">
+                            <div class="group-matches-title">สาย 2</div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M004</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">เนส-ไปท์</span>
+                                    <div class="score-display"><span class="set-score">12</span><span class="set-score">18</span><span class="total-sets">(0)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">โกอ้วน-นีล</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                </div>
+                            </div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M005</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">เนส-ไปท์</span>
+                                    <div class="score-display"><span class="set-score">18</span><span class="set-score">20</span><span class="total-sets">(0)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">กอล์ฟ-น็อต</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">22</span><span class="total-sets match-win">(2)</span></div></div>
+                                </div>
+                            </div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M006</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">โกอ้วน-นีล</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">กอล์ฟ-น็อต</span>
+                                    <div class="score-display"><span class="set-score">19</span><span class="set-score">17</span><span class="total-sets">(0)</span></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (tab === 'knockout') {
+                return `
+                    <div class="knockout-section">
+                        <h4 class="section-title">รอบ 4 ทีม (รองชนะเลิศ)</h4>
+                        <div class="matches-grid">
+                            <div class="match-card completed">
+                                <div class="match-header"><span>M007</span><span>เสร็จสิ้น</span></div>
+                                <div class="match-teams">
+                                    <div class="team"><span class="team-name">เอก-ชัย</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score">19</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="vs">VS</div>
+                                    <div class="team"><span class="team-name">กอล์ฟ-น็อต</span>
+                                    <div class="score-display"><span class="set-score">18</span><span class="set-score set-win">21</span><span class="set-score">16</span><span class="total-sets">(1)</span></div></div>
+                                </div>
+                            </div>
+                            <div class="match-card completed">
+                                <div class="match-header"><span>M008</span><span>เสร็จสิ้น</span></div>
+                                <div class="match-teams">
+                                    <div class="team"><span class="team-name">โกอ้วน-นีล</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score">18</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="vs">VS</div>
+                                    <div class="team"><span class="team-name">ต้น+Alai</span>
+                                    <div class="score-display"><span class="set-score">16</span><span class="set-score set-win">21</span><span class="set-score">19</span><span class="total-sets">(1)</span></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (tab === 'finals') {
+                return `
+                    <div class="finals-section">
+                        <div class="final-match championship">
+                            <div class="match-label">🏆 ชิงชนะเลิศ</div>
+                            <div class="match-card completed">
+                                <div class="match-header"><span>M009</span><span>เสร็จสิ้น</span></div>
+                                <div class="match-teams">
+                                    <div class="team"><span class="team-name">เอก-ชัย</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score">18</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="vs">VS</div>
+                                    <div class="team"><span class="team-name">โกอ้วน-นีล</span>
+                                    <div class="score-display"><span class="set-score">19</span><span class="set-score set-win">21</span><span class="set-score">17</span><span class="total-sets">(1)</span></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="final-match third-place">
+                            <div class="match-label">🥉 ชิงอันดับ 3</div>
+                            <div class="match-card completed">
+                                <div class="match-header"><span>M010</span><span>เสร็จสิ้น</span></div>
+                                <div class="match-teams">
+                                    <div class="team"><span class="team-name">กอล์ฟ-น็อต</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="set-score">-</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="vs">VS</div>
+                                    <div class="team"><span class="team-name">ต้น+Alai</span>
+                                    <div class="score-display"><span class="set-score">16</span><span class="set-score">19</span><span class="set-score">-</span><span class="total-sets">(0)</span></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function getContentB(tab) {
+            if (tab === 'round-robin') {
+                return `
+                    <div class="groups-container">
+                        <div class="group-card">
+                            <div class="group-title">สาย 1</div>
+                            <div class="standings-table">
+                                <div class="table-header">
+                                    <span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>คะแนน</span>
+                                </div>
+                                <div class="team-row qualified"><span class="rank">1</span><span class="team-name">ดี-นัท</span><span>2</span><span>2</span><span class="points">6</span></div>
+                                <div class="team-row qualified"><span class="rank">2</span><span class="team-name">โรบิ้น-เอกมุ่ย</span><span>2</span><span>1</span><span class="points">3</span></div>
+                                <div class="team-row"><span class="rank">3</span><span class="team-name">ชัย-แบงค์ 1000</span><span>2</span><span>0</span><span class="points">0</span></div>
+                            </div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">สาย 2</div>
+                            <div class="standings-table">
+                                <div class="table-header">
+                                    <span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>คะแนน</span>
+                                </div>
+                                <div class="team-row qualified"><span class="rank">1</span><span class="team-name">บิว-อาร์ท</span><span>2</span><span>2</span><span class="points">6</span></div>
+                                <div class="team-row qualified"><span class="rank">2</span><span class="team-name">ไปท์-มุก</span><span>2</span><span>1</span><span class="points">3</span></div>
+                                <div class="team-row"><span class="rank">3</span><span class="team-name">โค้ทนัท-บีม</span><span>2</span><span>0</span><span class="points">0</span></div>
+                            </div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">สาย 3</div>
+                            <div class="standings-table">
+                                <div class="table-header">
+                                    <span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>คะแนน</span>
+                                </div>
+                                <div class="team-row qualified"><span class="rank">1</span><span class="team-name">เติ้ง-โจน</span><span>2</span><span>2</span><span class="points">6</span></div>
+                                <div class="team-row qualified"><span class="rank">2</span><span class="team-name">ทอม-พี่หนุ่ม</span><span>2</span><span>1</span><span class="points">3</span></div>
+                                <div class="team-row"><span class="rank">3</span><span class="team-name">พี่เหมี่ยว-อามอ</span><span>2</span><span>0</span><span class="points">0</span></div>
+                            </div>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-title">สาย 4</div>
+                            <div class="standings-table">
+                                <div class="table-header">
+                                    <span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>คะแนน</span>
+                                </div>
+                                <div class="team-row qualified"><span class="rank">1</span><span class="team-name">เอก-เตี้ย</span><span>2</span><span>2</span><span class="points">6</span></div>
+                                <div class="team-row qualified"><span class="rank">2</span><span class="team-name">เพียว-พี่ตู้</span><span>2</span><span>1</span><span class="points">3</span></div>
+                                <div class="team-row"><span class="rank">3</span><span class="team-name">โก้-แต้ม</span><span>2</span><span>0</span><span class="points">0</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="round-robin-matches">
+                        <h4 class="matches-section-title">รายการแมทรอบแรก</h4>
+                        <div class="group-matches">
+                            <div class="group-matches-title">สาย 1</div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M011</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">ดี-นัท</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">โรบิ้น-เอกมุ่ย</span>
+                                    <div class="score-display"><span class="set-score">17</span><span class="set-score">19</span><span class="total-sets">(0)</span></div></div>
+                                </div>
+                            </div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M012</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">ดี-นัท</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">ชัย-แบงค์ 1000</span>
+                                    <div class="score-display"><span class="set-score">14</span><span class="set-score">16</span><span class="total-sets">(0)</span></div></div>
+                                </div>
+                            </div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M013</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">โรบิ้น-เอกมุ่ย</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">ชัย-แบงค์ 1000</span>
+                                    <div class="score-display"><span class="set-score">16</span><span class="set-score">18</span><span class="total-sets">(0)</span></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="group-matches">
+                            <div class="group-matches-title">สาย 2</div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M014</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">โค้ทนัท-บีม</span>
+                                    <div class="score-display"><span class="set-score">15</span><span class="set-score">17</span><span class="total-sets">(0)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">บิว-อาร์ท</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                </div>
+                            </div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M015</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">โค้ทนัท-บีม</span>
+                                    <div class="score-display"><span class="set-score">18</span><span class="set-score">20</span><span class="total-sets">(0)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">ไปท์-มุก</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">22</span><span class="total-sets match-win">(2)</span></div></div>
+                                </div>
+                            </div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M016</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">บิว-อาร์ท</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">ไปท์-มุก</span>
+                                    <div class="score-display"><span class="set-score">19</span><span class="set-score">17</span><span class="total-sets">(0)</span></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="group-matches">
+                            <div class="group-matches-title">สาย 3</div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M017</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">พี่เหมี่ยว-อามอ</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score">18</span><span class="total-sets">(1)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">เติ้ง-โจน</span>
+                                    <div class="score-display"><span class="set-score">19</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                </div>
+                            </div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M018</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">พี่เหมี่ยว-อามอ</span>
+                                    <div class="score-display"><span class="set-score">19</span><span class="set-score">16</span><span class="total-sets">(0)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">ทอม-พี่หนุ่ม</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                </div>
+                            </div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M019</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">เติ้ง-โจน</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">ทอม-พี่หนุ่ม</span>
+                                    <div class="score-display"><span class="set-score">16</span><span class="set-score">18</span><span class="total-sets">(0)</span></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="group-matches">
+                            <div class="group-matches-title">สาย 4</div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M020</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">เอก-เตี้ย</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">เพียว-พี่ตู้</span>
+                                    <div class="score-display"><span class="set-score">18</span><span class="set-score">16</span><span class="total-sets">(0)</span></div></div>
+                                </div>
+                            </div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M021</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">เอก-เตี้ย</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">โก้-แต้ม</span>
+                                    <div class="score-display"><span class="set-score">15</span><span class="set-score">17</span><span class="total-sets">(0)</span></div></div>
+                                </div>
+                            </div>
+                            <div class="round-robin-match-card completed">
+                                <div class="rr-match-header"><span>M022</span><span>เสร็จสิ้น</span></div>
+                                <div class="rr-match-teams">
+                                    <div class="rr-team"><span class="rr-team-name">เพียว-พี่ตู้</span>
+                                    <div class="score-display"><span class="set-score set-win">21</span><span class="set-score set-win">21</span><span class="total-sets match-win">(2)</span></div></div>
+                                    <div class="rr-vs">VS</div>
+                                    <div class="rr-team"><span class="rr-team-name">โก้-แต้ม</span>
+                                    <div class="score-display"><span class="set-score">17</span><span class="set-score">15</span><span class="total-sets">(0)</span></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (tab === 'knockout') {
+                return `
+                    <div class="knockout-section">
+                        <h4 class="section-title">รอบ 8 ทีม</h4>
+                        <div class="matches-grid">
+                            <div class="match-card completed">
+                                <div class="match-header"><span>M023</span><span>เสร็จสิ้น</span></div>
+                                <div class="match-teams">
+                                    <div class="team"><span class="team-name">ดี-นัท</span><span class="team-score winner">2</span></div>
+                                    <div class="vs">VS</div>
+                                    <div class="team"><span class="team-name">ไปท์-มุก</span><span class="team-score">1</span></div>
+                                </div>
+                            </div>
+                            <div class="match-card completed">
+                                <div class="match-header"><span>M024</span><span>เสร็จสิ้น</span></div>
+                                <div class="match-teams">
+                                    <div class="team"><span class="team-name">บิว-อาร์ท</span><span class="team-score winner">2</span></div>
+                                    <div class="vs">VS</div>
+                                    <div class="team"><span class="team-name">โรบิ้น-เอกมุ่ย</span><span class="team-score">1</span></div>
+                                </div>
+                            </div>
+                            <div class="match-card pending">
+                                <div class="match-header"><span>M025</span><span>รอการแข่งขัน</span></div>
+                                <div class="match-teams">
+                                    <div class="team"><span class="team-name">เติ้ง-โจน</span><span class="team-score">-</span></div>
+                                    <div class="vs">VS</div>
+                                    <div class="team"><span class="team-name">เพียว-พี่ตู้</span><span class="team-score">-</span></div>
+                                </div>
+                            </div>
+                            <div class="match-card pending">
+                                <div class="match-header"><span>M026</span><span>รอการแข่งขัน</span></div>
+                                <div class="match-teams">
+                                    <div class="team"><span class="team-name">เอก-เตี้ย</span><span class="team-score">-</span></div>
+                                    <div class="vs">VS</div>
+                                    <div class="team"><span class="team-name">ทอม-พี่หนุ่ม</span><span class="team-score">-</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <h4 class="section-title">รอบ 4 ทีม (รองชนะเลิศ)</h4>
+                        <div class="matches-grid">
+                            <div class="match-card pending">
+                                <div class="match-header"><span>M027</span><span>รอการแข่งขัน</span></div>
+                                <div class="match-teams">
+                                    <div class="team"><span class="team-name">ดี-นัท</span><span class="team-score">-</span></div>
+                                    <div class="vs">VS</div>
+                                    <div class="team"><span class="team-name">บิว-อาร์ท</span><span class="team-score">-</span></div>
+                                </div>
+                            </div>
+                            <div class="match-card pending">
+                                <div class="match-header"><span>M028</span><span>รอการแข่งขัน</span></div>
+                                <div class="match-teams">
+                                    <div class="team"><span class="team-name">รอผลรอบ8ทีม</span><span class="team-score">-</span></div>
+                                    <div class="vs">VS</div>
+                                    <div class="team"><span class="team-name">รอผลรอบ8ทีม</span><span class="team-score">-</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (tab === 'finals') {
+                return `
+                    <div class="finals-section">
+                        <div class="final-match championship">
+                            <div class="match-label">🏆 ชิงชนะเลิศ</div>
+                            <div class="match-card pending">
+                                <div class="match-header"><span>M029</span><span>รอผลรองชนะเลิศ</span></div>
+                                <div class="match-teams">
+                                    <div class="team"><span class="team-name">รอผลรองชนะเลิศ</span><span class="team-score">-</span></div>
+                                    <div class="vs">VS</div>
+                                    <div class="team"><span class="team-name">รอผลรองชนะเลิศ</span><span class="team-score">-</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="final-match third-place">
+                            <div class="match-label">🥉 ชิงอันดับ 3</div>
+                            <div class="match-card pending">
+                                <div class="match-header"><span>M030</span><span>รอผลรองชนะเลิศ</span></div>
+                                <div class="match-teams">
+                                    <div class="team"><span class="team-name">รอผลรองชนะเลิศ</span><span class="team-score">-</span></div>
+                                    <div class="vs">VS</div>
+                                    <div class="team"><span class="team-name">รอผลรองชนะเลิศ</span><span class="team-score">-</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
         }
 
         function openAdminModal() {
@@ -1250,7 +1288,7 @@
 
         function refreshData() {
             if (currentCategory) {
-                selectCategory(currentCategory);
+                loadCategory(currentCategory);
             }
         }
 
