@@ -260,6 +260,10 @@
             padding: 20px;
             text-align: center;
             margin: -20px -20px 20px -20px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .bracket-title {
@@ -271,6 +275,41 @@
         .bracket-stats {
             font-size: 14px;
             opacity: 0.9;
+        }
+
+        .refresh-btn {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .refresh-btn.loading {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: translateY(-50%) rotate(0deg); }
+            to { transform: translateY(-50%) rotate(360deg); }
         }
 
         .tabs-container {
@@ -923,6 +962,258 @@
             font-size: 16px;
         }
 
+        /* Settings Styles */
+        .settings-container {
+            padding: 20px;
+        }
+
+        .settings-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .settings-header h3 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+
+        .settings-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .settings-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+        }
+
+        .settings-section h4 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 8px;
+        }
+
+        .settings-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .action-group label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .action-group small {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .danger-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            max-width: 200px;
+        }
+
+        .danger-btn:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .warning-btn {
+            background: #ffc107;
+            color: #212529;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            max-width: 200px;
+        }
+
+        .warning-btn:hover {
+            background: #e0a800;
+            transform: translateY(-1px);
+        }
+
+        .primary-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .primary-btn:hover {
+            background: #0056b3;
+        }
+
+        .secondary-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .secondary-btn:hover {
+            background: #545b62;
+        }
+
+        .sheets-info, .system-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-item label {
+            font-weight: 600;
+            color: #333;
+            min-width: 120px;
+        }
+
+        .sheets-link {
+            color: #007bff;
+            text-decoration: none;
+            word-break: break-all;
+            font-size: 12px;
+        }
+
+        .sheets-link:hover {
+            text-decoration: underline;
+        }
+
+        .status-indicator {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-indicator.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .password-section {
+            margin: 20px 0;
+        }
+
+        .password-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .password-section input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .url-input-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        .small-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .small-btn:hover {
+            background: #218838;
+        }
+
+        .status-indicator.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-indicator.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .error {
+            padding: 20px;
+            background: #f8d7da;
+            color: #721c24;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
         .match-management-container {
             padding: 0;
         }
@@ -1419,6 +1710,12 @@
                 margin: -30px -30px 30px -30px;
             }
             
+            .refresh-btn {
+                right: 30px;
+                padding: 10px 14px;
+                font-size: 18px;
+            }
+            
             .bracket-title {
                 font-size: 28px;
             }
@@ -1525,6 +1822,12 @@
             .bracket-header {
                 padding: 15px;
                 margin: -15px -15px 15px -15px;
+            }
+            
+            .refresh-btn {
+                right: 15px;
+                padding: 6px 10px;
+                font-size: 14px;
             }
             
             .bracket-title {
@@ -3047,7 +3350,7 @@
             loadAdminMatches();
         }
 
-        function loadCategory(cat) {
+        async function loadCategory(cat) {
             document.querySelectorAll('.category-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -3058,7 +3361,15 @@
             const contentArea = document.getElementById('contentArea');
             contentArea.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>กำลังโหลดข้อมูล...</div></div>';
             
-            setTimeout(() => {
+            try {
+                // ดึงข้อมูลจาก Google Sheets หรือ Mock Data
+                const categoryData = await getCategoryData(cat);
+                const categoryName = getCategoryName(cat);
+                const stats = getCategoryStats(categoryData);
+                showCategory(cat, categoryName, stats);
+            } catch (error) {
+                console.error('Error loading category:', error);
+                // Fallback to hardcoded stats if data loading fails
                 if (cat === 'A') {
                     showCategory('A', 'มือ A', '6 ทีม • 2 สาย • 10 แมท');
                 } else if (cat === 'B') {
@@ -3074,7 +3385,304 @@
                 } else if (cat === 'ผสม') {
                     showCategory('ผสม', 'มือผสม', '12 ทีม • 4 สาย • 20 แมท');
                 }
-            }, 500);
+            }
+        }
+
+        // ฟังก์ชันดึงชื่อประเภท
+        function getCategoryName(category) {
+            const names = {
+                'A': 'มือ A',
+                'B': 'มือ B',
+                'C-B': 'มือ C-B',
+                'C-C': 'มือ C-C',
+                'D': 'มือ D',
+                'ใหม่': 'มือใหม่',
+                'ผสม': 'มือผสม'
+            };
+            return names[category] || category;
+        }
+
+        // ฟังก์ชันคำนวณสถิติ
+        function getCategoryStats(categoryData) {
+            if (!categoryData) return 'กำลังโหลด...';
+            
+            const teamCount = categoryData.groups ? 
+                categoryData.groups.reduce((total, group) => total + group.teams.length, 0) : 0;
+            const matchCount = categoryData.groups ? 
+                categoryData.groups.reduce((total, group) => total + group.matches.length, 0) : 0;
+            const knockoutCount = categoryData.knockoutMatches ? categoryData.knockoutMatches.length : 0;
+            const finalsCount = categoryData.finals ? categoryData.finals.length : 0;
+            const groupCount = categoryData.groups ? categoryData.groups.length : 0;
+            
+            return `${teamCount} ทีม • ${groupCount} สาย • ${matchCount + knockoutCount + finalsCount} แมท`;
+        }
+
+        // ฟังก์ชันทดสอบการแสดงผลแต่ละประเภท
+        function testAllCategories() {
+            console.log('🧪 Testing all categories...');
+            const categories = ['A', 'B', 'C-B', 'C-C', 'D', 'ใหม่', 'ผสม'];
+            
+            categories.forEach(category => {
+                console.log(`\n📋 Testing category: ${category}`);
+                try {
+                    const mockData = getMockCategoryData(category);
+                    console.log(`✅ Mock data loaded for ${category}:`, mockData);
+                    
+                    // ทดสอบการสร้าง content
+                    const roundRobinContent = generateRoundRobinContent(mockData);
+                    const knockoutContent = generateKnockoutContent(mockData);
+                    const finalsContent = generateFinalsContent(mockData);
+                    
+                    console.log(`✅ Round Robin content generated for ${category}`);
+                    console.log(`✅ Knockout content generated for ${category}`);
+                    console.log(`✅ Finals content generated for ${category}`);
+                    
+                } catch (error) {
+                    console.error(`❌ Error testing category ${category}:`, error);
+                }
+            });
+            
+            console.log('\n🎉 All categories tested successfully!');
+        }
+
+        // ฟังก์ชันตรวจสอบความสมบูรณ์ของ Mock Data
+        function validateMockData() {
+            console.log('🔍 Validating Mock Data...');
+            const categories = ['A', 'B', 'C-B', 'C-C', 'D', 'ใหม่', 'ผสม'];
+            let allValid = true;
+            
+            categories.forEach(category => {
+                console.log(`\n📋 Validating category: ${category}`);
+                try {
+                    const data = getMockCategoryData(category);
+                    
+                    // ตรวจสอบโครงสร้างข้อมูล
+                    if (!data.groups || !Array.isArray(data.groups)) {
+                        console.error(`❌ Invalid groups structure for ${category}`);
+                        allValid = false;
+                        return;
+                    }
+                    
+                    if (!data.knockoutMatches || !Array.isArray(data.knockoutMatches)) {
+                        console.error(`❌ Invalid knockoutMatches structure for ${category}`);
+                        allValid = false;
+                        return;
+                    }
+                    
+                    if (!data.finals || !Array.isArray(data.finals)) {
+                        console.error(`❌ Invalid finals structure for ${category}`);
+                        allValid = false;
+                        return;
+                    }
+                    
+                    // ตรวจสอบข้อมูลในแต่ละกลุ่ม
+                    data.groups.forEach((group, groupIndex) => {
+                        if (!group.name || !group.teams || !group.matches) {
+                            console.error(`❌ Invalid group structure for ${category}, group ${groupIndex}`);
+                            allValid = false;
+                        }
+                        
+                        // ตรวจสอบทีม
+                        group.teams.forEach((team, teamIndex) => {
+                            if (!team.name || typeof team.rank !== 'number' || typeof team.points !== 'number') {
+                                console.error(`❌ Invalid team structure for ${category}, group ${groupIndex}, team ${teamIndex}`);
+                                allValid = false;
+                            }
+                        });
+                        
+                        // ตรวจสอบแมท
+                        group.matches.forEach((match, matchIndex) => {
+                            if (!match.id || !match.team1 || !match.team2) {
+                                console.error(`❌ Invalid match structure for ${category}, group ${groupIndex}, match ${matchIndex}`);
+                                allValid = false;
+                            }
+                        });
+                    });
+                    
+                    console.log(`✅ Category ${category} validation passed`);
+                    
+                } catch (error) {
+                    console.error(`❌ Error validating category ${category}:`, error);
+                    allValid = false;
+                }
+            });
+            
+            if (allValid) {
+                console.log('\n🎉 All Mock Data validation passed!');
+            } else {
+                console.log('\n❌ Some Mock Data validation failed!');
+            }
+            
+            return allValid;
+        }
+
+        // ระบบ Cache สำหรับข้อมูลแต่ละประเภท
+        let categoryCache = {
+            'A': { data: null, lastUpdated: null, isLoaded: false },
+            'B': { data: null, lastUpdated: null, isLoaded: false },
+            'C-B': { data: null, lastUpdated: null, isLoaded: false },
+            'C-C': { data: null, lastUpdated: null, isLoaded: false },
+            'D': { data: null, lastUpdated: null, isLoaded: false },
+            'ใหม่': { data: null, lastUpdated: null, isLoaded: false },
+            'ผสม': { data: null, lastUpdated: null, isLoaded: false }
+        };
+
+        // ฟังก์ชันดึงข้อมูลจาก Google Sheets พร้อม Cache
+        async function loadCategoryDataFromSheets(category) {
+            try {
+                if (!GOOGLE_APPS_SCRIPT_URL || GOOGLE_APPS_SCRIPT_URL === 'YOUR_WEB_APP_URL_HERE') {
+                    console.log('Google Apps Script URL not configured, using mock data for', category);
+                    return null;
+                }
+
+                // ตรวจสอบ cache
+                if (categoryCache[category].isLoaded && categoryCache[category].lastUpdated) {
+                    const now = Date.now();
+                    const cacheExpiry = 5 * 60 * 1000; // 5 นาที
+                    if (now - categoryCache[category].lastUpdated < cacheExpiry) {
+                        console.log('Using cached data from Google Sheets for', category);
+                        return categoryCache[category].data;
+                    }
+                }
+
+                console.log('Loading data from Google Sheets for', category);
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getCategoryData&category=${encodeURIComponent(getCategoryName(category))}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    categoryCache[category].data = result.data;
+                    categoryCache[category].lastUpdated = Date.now();
+                    categoryCache[category].isLoaded = true;
+                    console.log('Data loaded successfully from Google Sheets for', category);
+                    return result.data;
+                } else {
+                    throw new Error(result.message || 'Failed to load data');
+                }
+            } catch (error) {
+                console.error('Error loading data from Google Sheets for', category, ':', error);
+                return null;
+            }
+        }
+
+        // ฟังก์ชันล้าง Cache
+        function clearCategoryCache(category = null) {
+            if (category) {
+                categoryCache[category] = { data: null, lastUpdated: null, isLoaded: false };
+                console.log(`Cache cleared for category: ${category}`);
+            } else {
+                Object.keys(categoryCache).forEach(cat => {
+                    categoryCache[cat] = { data: null, lastUpdated: null, isLoaded: false };
+                });
+                console.log('All cache cleared');
+            }
+        }
+
+        // ฟังก์ชันทดสอบ Google Sheets API
+        async function testGoogleSheetsAPI() {
+            console.log('🔗 Testing Google Sheets API...');
+            
+            try {
+                // ทดสอบการเชื่อมต่อพื้นฐาน
+                console.log('1. Testing basic connection...');
+                const testResponse = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=test`);
+                const testResult = await testResponse.json();
+                console.log('✅ Basic connection test:', testResult);
+                
+                // ทดสอบการดึงข้อมูลแต่ละประเภท
+                const categories = ['มือ A', 'มือ B', 'มือ C-B', 'มือ C-C', 'มือ D', 'มือใหม่', 'มือผสม'];
+                
+                for (const category of categories) {
+                    console.log(`\n2. Testing category: ${category}`);
+                    try {
+                        const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getCategoryData&category=${encodeURIComponent(category)}`);
+                        const result = await response.json();
+                        
+                        if (result.status === 'success') {
+                            console.log(`✅ Category ${category} data loaded:`, result);
+                            console.log(`   - Teams: ${result.counts?.teams || 0}`);
+                            console.log(`   - Matches: ${result.counts?.matches || 0}`);
+                            console.log(`   - Standings: ${result.counts?.standings || 0}`);
+                            console.log(`   - Draw History: ${result.counts?.drawHistory || 0}`);
+                        } else {
+                            console.log(`⚠️ Category ${category} returned error:`, result.message);
+                        }
+                    } catch (error) {
+                        console.error(`❌ Error testing category ${category}:`, error);
+                    }
+                }
+                
+                // ทดสอบการดึงข้อมูลทั้งหมด
+                console.log('\n3. Testing getAllData...');
+                try {
+                    const allDataResponse = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getAllData`);
+                    const allDataResult = await allDataResponse.json();
+                    console.log('✅ All data test:', allDataResult);
+                } catch (error) {
+                    console.error('❌ Error testing getAllData:', error);
+                }
+                
+                console.log('\n🎉 Google Sheets API testing completed!');
+                
+            } catch (error) {
+                console.error('❌ Google Sheets API testing failed:', error);
+            }
+        }
+
+        // ฟังก์ชันตรวจสอบข้อผิดพลาดทั่วไป
+        function checkForErrors() {
+            console.log('🔧 Checking for common errors...');
+            let errorCount = 0;
+            
+            // ตรวจสอบ Google Apps Script URL
+            if (!GOOGLE_APPS_SCRIPT_URL || GOOGLE_APPS_SCRIPT_URL === 'YOUR_WEB_APP_URL_HERE') {
+                console.warn('⚠️ Google Apps Script URL not configured');
+                errorCount++;
+            }
+            
+            // ตรวจสอบ Google Sheets URL
+            if (!GOOGLE_SHEETS_URL) {
+                console.warn('⚠️ Google Sheets URL not configured');
+                errorCount++;
+            }
+            
+            // ตรวจสอบ localStorage
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+                console.log('✅ localStorage is working');
+            } catch (error) {
+                console.error('❌ localStorage error:', error);
+                errorCount++;
+            }
+            
+            // ตรวจสอบ fetch API
+            if (typeof fetch === 'undefined') {
+                console.error('❌ Fetch API not available');
+                errorCount++;
+            } else {
+                console.log('✅ Fetch API is available');
+            }
+            
+            // ตรวจสอบ console
+            if (typeof console === 'undefined') {
+                console.error('❌ Console not available');
+                errorCount++;
+            } else {
+                console.log('✅ Console is available');
+            }
+            
+            if (errorCount === 0) {
+                console.log('🎉 No errors found! System is ready.');
+            } else {
+                console.log(`⚠️ Found ${errorCount} potential issues.`);
+            }
+            
+            return errorCount === 0;
         }
 
         function showCategory(categoryKey, categoryName, stats) {
@@ -3082,8 +3690,13 @@
             contentArea.innerHTML = `
                 <div class="bracket-container">
                     <div class="bracket-header">
-                        <h2 class="bracket-title">${categoryName}</h2>
-                        <div class="bracket-stats">${stats}</div>
+                        <div class="bracket-content">
+                            <h2 class="bracket-title">${categoryName}</h2>
+                            <div class="bracket-stats">${stats}</div>
+                        </div>
+                        <button class="refresh-btn" onclick="refreshCategory('${categoryKey}')" title="รีเฟรชข้อมูล">
+                            🔄
+                        </button>
                     </div>
                     <div class="tabs-container">
                         <div class="tabs-nav">
@@ -3092,14 +3705,70 @@
                             <button class="tab-btn" onclick="switchTab('${categoryKey}', 'finals')">🏆 ชิงชนะเลิศ</button>
                         </div>
                         <div class="tab-content" id="tabContent">
-                            ${getContent(categoryKey, 'round-robin')}
+                            <div class="loading"><div class="loading-spinner"></div><div>กำลังโหลดข้อมูล...</div></div>
                         </div>
                     </div>
                 </div>
             `;
+            
+            // โหลดข้อมูลเริ่มต้นสำหรับแท็บแรก
+            setTimeout(async () => {
+                try {
+                    const content = await getContent(categoryKey, 'round-robin');
+                    const tabContent = document.getElementById('tabContent');
+                    if (tabContent) {
+                        tabContent.innerHTML = content;
+                    }
+                } catch (error) {
+                    console.error('Error loading initial content:', error);
+                    const tabContent = document.getElementById('tabContent');
+                    if (tabContent) {
+                        tabContent.innerHTML = '<div class="error">เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
+                    }
+                }
+            }, 100);
         }
 
-        function switchTab(category, tab) {
+        // ฟังก์ชันรีเฟรชข้อมูล
+        async function refreshCategory(categoryKey) {
+            const refreshBtn = document.querySelector('.refresh-btn');
+            const originalIcon = refreshBtn.innerHTML;
+            
+            try {
+                // แสดง loading animation
+                refreshBtn.classList.add('loading');
+                refreshBtn.innerHTML = '⏳';
+                refreshBtn.disabled = true;
+                
+                // ล้าง cache ของประเภทนี้
+                const cacheKey = `category_${categoryKey}`;
+                localStorage.removeItem(cacheKey);
+                
+                // รีเฟรชข้อมูล
+                await loadCategory(categoryKey);
+                
+                // แสดง success animation
+                refreshBtn.innerHTML = '✅';
+                setTimeout(() => {
+                    refreshBtn.innerHTML = originalIcon;
+                    refreshBtn.classList.remove('loading');
+                    refreshBtn.disabled = false;
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error refreshing category:', error);
+                
+                // แสดง error animation
+                refreshBtn.innerHTML = '❌';
+                setTimeout(() => {
+                    refreshBtn.innerHTML = originalIcon;
+                    refreshBtn.classList.remove('loading');
+                    refreshBtn.disabled = false;
+                }, 2000);
+            }
+        }
+
+        async function switchTab(category, tab) {
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -3107,11 +3776,19 @@
             event.target.classList.add('active');
             
             const tabContent = document.getElementById('tabContent');
-            tabContent.innerHTML = getContent(category, tab);
+            tabContent.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>กำลังโหลดข้อมูล...</div></div>';
+            
+            try {
+                const content = await getContent(category, tab);
+                tabContent.innerHTML = content;
+            } catch (error) {
+                console.error('Error loading tab content:', error);
+                tabContent.innerHTML = '<div class="error">เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
+            }
         }
 
-        function getContent(category, tab) {
-            const categoryData = getCategoryData(category);
+        async function getContent(category, tab) {
+            const categoryData = await getCategoryData(category);
             
             if (tab === 'round-robin') {
                 return generateRoundRobinContent(categoryData);
@@ -3122,7 +3799,133 @@
             }
         }
 
-        function getCategoryData(category) {
+        async function getCategoryData(category) {
+            try {
+                // ลองดึงข้อมูลจาก Google Sheets ก่อน
+                const sheetsData = await loadCategoryDataFromSheets(category);
+                if (sheetsData) {
+                    const convertedData = convertSheetsDataToDisplayFormat(sheetsData, category);
+                    if (convertedData) {
+                        return convertedData;
+                    }
+                }
+
+                // ถ้าไม่สามารถดึงข้อมูลจาก Google Sheets ได้ ให้ใช้ Mock Data
+                console.log('Using mock data for', category);
+                return getMockCategoryData(category);
+            } catch (error) {
+                console.error('Error loading category data:', error);
+                console.log('Falling back to mock data for', category);
+                return getMockCategoryData(category);
+            }
+        }
+
+        // ฟังก์ชันแปลงข้อมูลจาก Google Sheets เป็นรูปแบบ Display
+        function convertSheetsDataToDisplayFormat(sheetsData, category) {
+            if (!sheetsData) return getMockCategoryData(category);
+
+            const teams = sheetsData.teams || [];
+            const matches = sheetsData.matches || [];
+            const standings = sheetsData.standings || [];
+            const drawHistory = sheetsData.drawHistory || [];
+
+            // แปลงข้อมูลให้ตรงกับรูปแบบเดิม
+            return convertToDisplayFormat(teams, matches, standings, drawHistory, category);
+        }
+
+        // ฟังก์ชันแปลงข้อมูลจาก Google Sheets เป็นรูปแบบ Display
+        function convertToDisplayFormat(teams, matches, standings, drawHistory, category) {
+            console.log('Converting data for category:', category);
+            console.log('Teams:', teams);
+            console.log('Matches:', matches);
+            console.log('Standings:', standings);
+            console.log('Draw History:', drawHistory);
+            
+            // แยกแมทตาม round_type
+            const roundRobinMatches = matches.filter(m => m.round_type === 'รอบแรก');
+            const knockoutMatches = matches.filter(m => m.round_type === 'รอบ4ทีม' || m.round_type === 'รอบ8ทีม');
+            const finalsMatches = matches.filter(m => m.round_type === 'ชิงชนะเลิศ' || m.round_type === 'ชิงอันดับ3');
+            
+            console.log('Round Robin Matches:', roundRobinMatches);
+            console.log('Knockout Matches:', knockoutMatches);
+            console.log('Finals Matches:', finalsMatches);
+
+            // สร้าง groups จาก standings
+            const groups = {};
+            standings.forEach(standing => {
+                if (!groups[standing.group_name]) {
+                    groups[standing.group_name] = {
+                        name: standing.group_name,
+                        teams: [],
+                        matches: []
+                    };
+                }
+                groups[standing.group_name].teams.push({
+                    rank: standing.rank_in_group,
+                    name: standing.team_name,
+                    matches: standing.matches_played,
+                    wins: standing.wins,
+                    points: standing.points,
+                    qualified: standing.qualified
+                });
+            });
+
+            // เพิ่มแมทรอบแรกในแต่ละกลุ่ม
+            Object.keys(groups).forEach(groupName => {
+                const groupMatches = roundRobinMatches.filter(m => {
+                    // หาทีมที่อยู่ในกลุ่มนี้
+                    const team1InGroup = standings.find(s => s.team_id === m.team1_id && s.group_name === groupName);
+                    const team2InGroup = standings.find(s => s.team_id === m.team2_id && s.group_name === groupName);
+                    return team1InGroup && team2InGroup;
+                });
+
+                groups[groupName].matches = groupMatches.map(m => ({
+                    id: m.match_id,
+                    team1: m.team1_name,
+                    team2: m.team2_name,
+                    score1: [m.set1_team1, m.set2_team1, m.set3_team1].filter(s => s > 0),
+                    score2: [m.set1_team2, m.set2_team2, m.set3_team2].filter(s => s > 0),
+                    sets1: m.set1_team1 > m.set1_team2 ? 1 : 0 + (m.set2_team1 > m.set2_team2 ? 1 : 0) + (m.set3_team1 > m.set3_team2 ? 1 : 0),
+                    sets2: m.set1_team2 > m.set1_team1 ? 1 : 0 + (m.set2_team2 > m.set2_team1 ? 1 : 0) + (m.set3_team2 > m.set3_team1 ? 1 : 0),
+                    completed: m.match_status === 'completed'
+                }));
+            });
+
+            // แปลง knockout matches
+            const knockoutFormatted = knockoutMatches.map(m => ({
+                id: m.match_id,
+                team1: m.team1_name,
+                team2: m.team2_name,
+                score1: [m.set1_team1, m.set2_team1, m.set3_team1].filter(s => s > 0),
+                score2: [m.set1_team2, m.set2_team2, m.set3_team2].filter(s => s > 0),
+                sets1: m.set1_team1 > m.set1_team2 ? 1 : 0 + (m.set2_team1 > m.set2_team2 ? 1 : 0) + (m.set3_team1 > m.set3_team2 ? 1 : 0),
+                sets2: m.set1_team2 > m.set1_team1 ? 1 : 0 + (m.set2_team2 > m.set2_team1 ? 1 : 0) + (m.set3_team2 > m.set3_team1 ? 1 : 0),
+                completed: m.match_status === 'completed'
+            }));
+
+            // แปลง finals matches
+            const finalsFormatted = finalsMatches.map(m => ({
+                id: m.match_id,
+                type: m.round_type === 'ชิงชนะเลิศ' ? 'championship' : 'third-place',
+                team1: m.team1_name,
+                team2: m.team2_name,
+                score1: [m.set1_team1, m.set2_team1, m.set3_team1].filter(s => s > 0),
+                score2: [m.set1_team2, m.set2_team2, m.set3_team2].filter(s => s > 0),
+                sets1: m.set1_team1 > m.set1_team2 ? 1 : 0 + (m.set2_team1 > m.set2_team2 ? 1 : 0) + (m.set3_team1 > m.set3_team2 ? 1 : 0),
+                sets2: m.set1_team2 > m.set1_team1 ? 1 : 0 + (m.set2_team2 > m.set2_team1 ? 1 : 0) + (m.set3_team2 > m.set3_team1 ? 1 : 0),
+                completed: m.match_status === 'completed'
+            }));
+
+            return {
+                groups: Object.values(groups),
+                knockoutMatches: knockoutFormatted,
+                finals: finalsFormatted
+            };
+        }
+
+        // ฟังก์ชัน Mock Data (Fallback)
+        function getMockCategoryData(category) {
+            console.log('Using mock data for category:', category);
             const data = {
                 'A': {
                     groups: [
@@ -3562,6 +4365,13 @@
         }
 
         function generateRoundRobinContent(data) {
+            console.log('Generating round robin content with data:', data);
+            
+            if (!data || !data.groups) {
+                console.error('Invalid data structure:', data);
+                return '<div class="error">ข้อมูลไม่ถูกต้อง</div>';
+            }
+            
             let content = '<div class="groups-container">';
             
             data.groups.forEach(group => {
@@ -3658,6 +4468,13 @@
         }
 
         function generateKnockoutContent(data) {
+            console.log('Generating knockout content with data:', data);
+            
+            if (!data || !data.knockoutMatches) {
+                console.error('Invalid data structure for knockout:', data);
+                return '<div class="error">ข้อมูลไม่ถูกต้อง</div>';
+            }
+            
             let content = `
                 <div class="knockout-section">
                     <h4 class="section-title">รอบ ${data.knockoutMatches.length >= 4 ? '8' : data.knockoutMatches.length * 2} ทีม</h4>
@@ -3775,6 +4592,13 @@
         }
 
         function generateFinalsContent(data) {
+            console.log('Generating finals content with data:', data);
+            
+            if (!data || !data.finals) {
+                console.error('Invalid data structure for finals:', data);
+                return '<div class="error">ข้อมูลไม่ถูกต้อง</div>';
+            }
+            
             let content = '<div class="finals-section">';
             
             data.finals.forEach(match => {
@@ -3921,6 +4745,13 @@
             
             const tabContent = document.getElementById('adminTabContent');
             tabContent.innerHTML = getAdminTabContent(tab);
+            
+            // Update data stats when opening settings tab
+            if (tab === 'settings') {
+                setTimeout(() => {
+                    updateDataStats();
+                }, 100);
+            }
         }
 
         function getAdminTabContent(tab) {
@@ -3932,9 +4763,9 @@
                     allMatchesData = calculateAllMatchesStats();
                     return generateAllMatchesContent();
                 case 'draw-system':
-                    return '<div class="admin-placeholder">🎲 ระบบจับฉลาก - พัฒนาในขั้นตอนต่อไป</div>';
+                    return generateDrawSystemContent();
                 case 'settings':
-                    return '<div class="admin-placeholder">⚙️ ตั้งค่าระบบ - พัฒนาในขั้นตอนต่อไป</div>';
+                    return generateSettingsContent();
                 default:
                     return '<div class="admin-placeholder">เลือกแท็บด้านบน</div>';
             }
@@ -4173,6 +5004,552 @@
             `;
         }
 
+        // ===================== Draw System (Manual) =====================
+        let drawOverrides = {};
+        let drawHistory = [];
+
+        function loadDrawPersistence() {
+            try {
+                const o = localStorage.getItem('mn_draw_overrides');
+                const h = localStorage.getItem('mn_draw_history');
+                drawOverrides = o ? JSON.parse(o) : {};
+                drawHistory = h ? JSON.parse(h) : [];
+            } catch(e) {
+                drawOverrides = {};
+                drawHistory = [];
+            }
+        }
+
+        function saveDrawPersistence() {
+            localStorage.setItem('mn_draw_overrides', JSON.stringify(drawOverrides));
+            localStorage.setItem('mn_draw_history', JSON.stringify(drawHistory));
+        }
+
+        function applyDrawOverridesToData(data) {
+            if (!data) return;
+            if (data.knockoutMatches) {
+                data.knockoutMatches = data.knockoutMatches.map(m => {
+                    const o = drawOverrides[m.id];
+                    if (o) {
+                        return { ...m, team1: o.team1 || m.team1, team2: o.team2 || m.team2 };
+                    }
+                    return m;
+                });
+            }
+            if (data.finals) {
+                data.finals = data.finals.map(m => {
+                    const o = drawOverrides[m.id];
+                    if (o) {
+                        return { ...m, team1: o.team1 || m.team1, team2: o.team2 || m.team2 };
+                    }
+                    return m;
+                });
+            }
+        }
+
+        function generateDrawSystemContent() {
+            const categories = ['A', 'B', 'C-B', 'C-C', 'D', 'ใหม่', 'ผสม'];
+            const options = categories.map(c => `<option value="${c}">มือ ${c}</option>`).join('');
+            const teamList = (allTeams || []).map(t => t.name);
+            const datalist = teamList.map(n => `<option value="${n}"></option>`).join('');
+
+            return `
+                <div class="draw-container">
+                    <div class="draw-header">
+                        <h3>🎲 ระบบจับฉลาก (บันทึกจากการจับแมนน่วล)</h3>
+                        <p>เลือกประเภทและกรอกคู่ประกบของแมทที่รอจับฉลาก จากนั้นกดบันทึก</p>
+                    </div>
+                    <div class="selectors-container">
+                        <div class="category-selector">
+                            <label for="drawCategorySelect">ประเภทการแข่งขัน:</label>
+                            <select id="drawCategorySelect" class="admin-select" onchange="renderDrawMatches()">
+                                <option value="">เลือกประเภท</option>
+                                ${options}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="drawMatchesArea" class="draw-matches-area">
+                        <div class="admin-placeholder">เลือกประเภทเพื่อแสดงรายการแมทที่รอจับฉลาก</div>
+                    </div>
+
+                    <div class="draw-history">
+                        <h4>🗂 ประวัติการจับฉลาก (${drawHistory.length})</h4>
+                        <div id="drawHistoryTable">${generateDrawHistoryTable()}</div>
+                    </div>
+
+                    <datalist id="teamNamesList">${datalist}</datalist>
+                </div>
+            `;
+        }
+
+        function generateDrawHistoryTable() {
+            if (!drawHistory || drawHistory.length === 0) {
+                return '<div class="admin-placeholder">ยังไม่มีประวัติการจับฉลาก</div>';
+            }
+            const rows = drawHistory.slice().reverse().map(h => `
+                <tr>
+                    <td>${h.date}</td>
+                    <td>มือ ${h.category}</td>
+                    <td>${h.round}</td>
+                    <td>${h.matchId}</td>
+                    <td>${h.team1}</td>
+                    <td>${h.team2}</td>
+                    <td>${h.drawnBy || '-'}</td>
+                    <td>${h.notes || ''}</td>
+                </tr>
+            `).join('');
+            return `
+                <div class="matches-table-scroll">
+                    <table class="matches-table">
+                        <thead>
+                            <tr>
+                                <th>วันที่</th>
+                                <th>ประเภท</th>
+                                <th>รอบ</th>
+                                <th>Match ID</th>
+                                <th>ทีม 1</th>
+                                <th>ทีม 2</th>
+                                <th>ผู้บันทึก</th>
+                                <th>หมายเหตุ</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function getWaitingDrawMatches(categoryKey) {
+            const data = getCategoryData(categoryKey);
+            const waiting = [];
+            const isPlaceholder = (name) => !name || name.includes('รอผล') || name.includes('รอจับฉลาก') || name === 'TBD';
+            data.knockoutMatches.forEach((m, idx) => {
+                let round = data.knockoutMatches.length >= 4 && idx < 4 ? 'รอบ 8 ทีม' : 'รอบ 4 ทีม';
+                if (isPlaceholder(m.team1) || isPlaceholder(m.team2)) {
+                    waiting.push({ ...m, round });
+                }
+            });
+            data.finals.forEach(m => {
+                const round = m.type === 'championship' ? 'ชิงชนะเลิศ' : 'ชิงอันดับ 3';
+                if (isPlaceholder(m.team1) || isPlaceholder(m.team2)) {
+                    waiting.push({ ...m, round });
+                }
+            });
+            return waiting;
+        }
+
+        function renderDrawMatches() {
+            const cat = document.getElementById('drawCategorySelect').value;
+            const area = document.getElementById('drawMatchesArea');
+            if (!cat) {
+                area.innerHTML = '<div class="admin-placeholder">เลือกประเภทเพื่อแสดงรายการแมทที่รอจับฉลาก</div>';
+                return;
+            }
+            const matches = getWaitingDrawMatches(cat);
+            if (matches.length === 0) {
+                area.innerHTML = '<div class="admin-placeholder">ไม่มีแมทที่รอจับฉลากในประเภทนี้</div>';
+                return;
+            }
+            const cards = matches.map(m => `
+                <div class="match-card pending">
+                    <div class="match-header">
+                        <span>${m.id}</span>
+                        <span>${m.round}</span>
+                    </div>
+                    <div class="match-teams">
+                        <div class="team">
+                            <span class="team-name">ทีม 1</span>
+                            <input list="teamNamesList" class="admin-search-input" id="draw_${m.id}_t1" placeholder="${m.team1 || 'พิมพ์ชื่อทีม'}">
+                        </div>
+                        <div class="rr-vs">VS</div>
+                        <div class="team">
+                            <span class="team-name">ทีม 2</span>
+                            <input list="teamNamesList" class="admin-search-input" id="draw_${m.id}_t2" placeholder="${m.team2 || 'พิมพ์ชื่อทีม'}">
+                        </div>
+                    </div>
+                    <div class="match-actions" style="margin-top: 10px;">
+                        <button class="table-btn-record" onclick="applyDrawForMatch('${cat}','${m.round}','${m.id}')">บันทึกคู่ประกบ</button>
+                    </div>
+                </div>
+            `).join('');
+            area.innerHTML = `<div class="matches-grid">${cards}</div>`;
+        }
+
+        function applyDrawForMatch(categoryKey, roundText, matchId) {
+            const t1 = (document.getElementById(`draw_${matchId}_t1`).value || '').trim();
+            const t2 = (document.getElementById(`draw_${matchId}_t2`).value || '').trim();
+            if (!t1 || !t2) {
+                alert('กรุณากรอกชื่อทีมทั้งสองฝั่ง');
+                return;
+            }
+            drawOverrides[matchId] = { team1: t1, team2: t2 };
+            drawHistory.push({
+                date: new Date().toLocaleString(),
+                category: categoryKey,
+                round: roundText,
+                matchId,
+                team1: t1,
+                team2: t2,
+                drawnBy: 'admin',
+                notes: ''
+            });
+            saveDrawPersistence();
+            alert(`บันทึกคู่ประกบให้แมท ${matchId} เรียบร้อย`);
+            renderDrawMatches();
+        }
+
+        // ===================== Settings System =====================
+        const GOOGLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1xtwqAxLOdKJknKxxYCNQ14Vm2inMIfuKg5Xddsy69rw/edit?usp=sharing';
+        const GOOGLE_SHEETS_ID = '1xtwqAxLOdKJknKxxYCNQ14Vm2inMIfuKg5Xddsy69rw';
+        
+        // Google Apps Script Web App URL - ต้องอัปเดตหลังจาก Deploy
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0MX9n8pxxurUmv9lrhpCK0hu8RLlo3f1gT0D9PLWQrJNquwngETlPlQCyJUrCOD3IYg/exec';
+
+        function generateSettingsContent() {
+            return `
+                <div class="settings-container">
+                    <div class="settings-header">
+                        <h3>⚙️ ตั้งค่าระบบ</h3>
+                        <p>จัดการข้อมูลและตั้งค่าระบบการแข่งขัน</p>
+                    </div>
+                    
+                    <div class="settings-sections">
+                        <!-- Data Management Section -->
+                        <div class="settings-section">
+                            <h4>📊 การจัดการข้อมูล</h4>
+                            <div class="settings-actions">
+                                <div class="action-group">
+                                    <label>รีเซ็ตระบบทั้งหมด:</label>
+                                    <button class="danger-btn" onclick="showResetModal('system')">🗑️ รีเซ็ตระบบ</button>
+                                    <small>ล้างข้อมูลทั้งหมด (รหัส: 567)</small>
+                                </div>
+                                <div class="action-group">
+                                    <label>รีเซ็ตข้อมูลจับฉลาก:</label>
+                                    <button class="warning-btn" onclick="showResetModal('draw')">🎲 รีเซ็ตจับฉลาก</button>
+                                    <small>ล้างข้อมูลจับฉลากเท่านั้น (รหัส: 567)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Testing Section -->
+                        <div class="settings-section">
+                            <h4>🧪 การทดสอบระบบ</h4>
+                            <div class="settings-actions">
+                                <div class="action-group">
+                                    <label>ทดสอบการแสดงผลทุกประเภท:</label>
+                                    <button class="btn" onclick="testAllCategories()">🧪 ทดสอบทุกประเภท</button>
+                                    <small>ทดสอบการแสดงผล Mock data ในทุกประเภท</small>
+                                </div>
+                                <div class="action-group">
+                                    <label>ตรวจสอบความสมบูรณ์ของ Mock Data:</label>
+                                    <button class="btn" onclick="validateMockData()">🔍 ตรวจสอบ Mock Data</button>
+                                    <small>ตรวจสอบโครงสร้างและความสมบูรณ์ของข้อมูล Mock</small>
+                                </div>
+                                <div class="action-group">
+                                    <label>ทดสอบ Google Sheets API:</label>
+                                    <button class="btn" onclick="testGoogleSheetsAPI()">🔗 ทดสอบ Google Sheets API</button>
+                                    <small>ทดสอบการเชื่อมต่อและดึงข้อมูลจาก Google Sheets</small>
+                                </div>
+                                <div class="action-group">
+                                    <label>ล้าง Cache ข้อมูล:</label>
+                                    <button class="btn" onclick="clearCategoryCache()">🗑️ ล้าง Cache ทั้งหมด</button>
+                                    <small>ล้างข้อมูล Cache เพื่อดึงข้อมูลใหม่จาก Google Sheets</small>
+                                </div>
+                                <div class="action-group">
+                                    <label>ตรวจสอบข้อผิดพลาด:</label>
+                                    <button class="btn" onclick="checkForErrors()">🔧 ตรวจสอบข้อผิดพลาด</button>
+                                    <small>ตรวจสอบข้อผิดพลาดทั่วไปและความพร้อมของระบบ</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Google Sheets Section -->
+                        <div class="settings-section">
+                            <h4>📋 Google Sheets</h4>
+                            <div class="sheets-info">
+                                <div class="info-item">
+                                    <label>Google Sheets URL:</label>
+                                    <a href="${GOOGLE_SHEETS_URL}" target="_blank" class="sheets-link">${GOOGLE_SHEETS_URL}</a>
+                                </div>
+                                <div class="info-item">
+                                    <label>Apps Script URL:</label>
+                                    <div class="url-input-container">
+                                        <input type="text" id="appsScriptUrl" class="url-input" 
+                                               placeholder="วาง Web App URL ที่ได้จาก Apps Script" 
+                                               value="${GOOGLE_APPS_SCRIPT_URL}">
+                                        <button class="small-btn" onclick="updateAppsScriptUrl()">อัปเดต</button>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <label>สถานะ:</label>
+                                    <span id="sheetsStatus" class="status-indicator">🔍 กำลังตรวจสอบ...</span>
+                                </div>
+                            </div>
+                            <div class="settings-actions">
+                                <button class="primary-btn" onclick="testGoogleSheetsConnection()">🔗 ทดสอบการเชื่อมต่อ</button>
+                                <button class="secondary-btn" onclick="openGoogleSheets()">📖 เปิด Google Sheets</button>
+                                <button class="secondary-btn" onclick="showSetupInstructions()">📋 วิธีติดตั้ง</button>
+                            </div>
+                        </div>
+
+                        <!-- System Info Section -->
+                        <div class="settings-section">
+                            <h4>ℹ️ ข้อมูลระบบ</h4>
+                            <div class="system-info">
+                                <div class="info-item">
+                                    <label>เวอร์ชัน:</label>
+                                    <span>MN Tournament 2025 v1.0</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>ข้อมูลในระบบ:</label>
+                                    <span id="dataStats">กำลังโหลด...</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>ข้อมูลจับฉลาก:</label>
+                                    <span id="drawStats">กำลังโหลด...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reset Confirmation Modal -->
+                <div class="modal" id="resetModal">
+                    <div class="modal-content">
+                        <h3 id="resetModalTitle">ยืนยันการรีเซ็ต</h3>
+                        <p id="resetModalMessage">คุณแน่ใจหรือไม่ที่จะรีเซ็ตข้อมูล?</p>
+                        <div class="password-section">
+                            <label for="resetPassword">รหัสผ่าน:</label>
+                            <input type="password" id="resetPassword" placeholder="กรอกรหัสผ่าน" maxlength="3">
+                        </div>
+                        <div class="modal-buttons">
+                            <button class="modal-btn btn-cancel" onclick="closeResetModal()">ยกเลิก</button>
+                            <button class="modal-btn btn-danger" onclick="confirmReset()">ยืนยัน</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showResetModal(type) {
+            const modal = document.getElementById('resetModal');
+            const title = document.getElementById('resetModalTitle');
+            const message = document.getElementById('resetModalMessage');
+            
+            if (type === 'system') {
+                title.textContent = '🗑️ รีเซ็ตระบบทั้งหมด';
+                message.textContent = 'การดำเนินการนี้จะล้างข้อมูลทั้งหมดในระบบ รวมถึงผลการแข่งขันและข้อมูลจับฉลาก';
+            } else if (type === 'draw') {
+                title.textContent = '🎲 รีเซ็ตข้อมูลจับฉลาก';
+                message.textContent = 'การดำเนินการนี้จะล้างเฉพาะข้อมูลการจับฉลากเท่านั้น';
+            }
+            
+            modal.dataset.resetType = type;
+            modal.style.display = 'block';
+            document.getElementById('resetPassword').focus();
+        }
+
+        function closeResetModal() {
+            document.getElementById('resetModal').style.display = 'none';
+            document.getElementById('resetPassword').value = '';
+        }
+
+        function confirmReset() {
+            const password = document.getElementById('resetPassword').value;
+            const resetType = document.getElementById('resetModal').dataset.resetType;
+            
+            if (password !== '567') {
+                alert('รหัสผ่านไม่ถูกต้อง');
+                return;
+            }
+            
+            if (resetType === 'system') {
+                resetAllSystem();
+            } else if (resetType === 'draw') {
+                resetDrawSystem();
+            }
+            
+            closeResetModal();
+        }
+
+        function resetAllSystem() {
+            if (confirm('⚠️ คุณแน่ใจหรือไม่ที่จะล้างข้อมูลทั้งหมด?\n\nการดำเนินการนี้ไม่สามารถย้อนกลับได้!')) {
+                // Clear all localStorage data
+                localStorage.clear();
+                
+                // Reset global variables
+                drawOverrides = {};
+                drawHistory = [];
+                allTeams = [];
+                currentAdminMatches = [];
+                allMatchesData = null;
+                
+                alert('✅ รีเซ็ตระบบทั้งหมดเรียบร้อย\n\nข้อมูลทั้งหมดถูกล้างแล้ว');
+                
+                // Refresh the page to reset everything
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            }
+        }
+
+        function resetDrawSystem() {
+            if (confirm('⚠️ คุณแน่ใจหรือไม่ที่จะล้างข้อมูลการจับฉลาก?\n\nการดำเนินการนี้ไม่สามารถย้อนกลับได้!')) {
+                // Clear only draw-related data
+                localStorage.removeItem('mn_draw_overrides');
+                localStorage.removeItem('mn_draw_history');
+                
+                // Reset draw variables
+                drawOverrides = {};
+                drawHistory = [];
+                
+                alert('✅ รีเซ็ตข้อมูลจับฉลากเรียบร้อย\n\nข้อมูลการจับฉลากถูกล้างแล้ว');
+                
+                // Refresh draw system if it's currently open
+                if (document.getElementById('drawMatchesArea')) {
+                    renderDrawMatches();
+                }
+            }
+        }
+
+        async function testGoogleSheetsConnection() {
+            const statusElement = document.getElementById('sheetsStatus');
+            statusElement.innerHTML = '🔄 กำลังทดสอบ...';
+            
+            try {
+                // ตรวจสอบว่าได้ตั้งค่า URL แล้วหรือยัง
+                if (GOOGLE_APPS_SCRIPT_URL === 'YOUR_WEB_APP_URL_HERE') {
+                    statusElement.innerHTML = '⚠️ ยังไม่ได้ตั้งค่า URL';
+                    statusElement.className = 'status-indicator warning';
+                    alert('⚠️ กรุณาตั้งค่า Google Apps Script URL ก่อน!\n\n1. Deploy Google Apps Script เป็น Web App\n2. คัดลอก Web App URL\n3. อัปเดต GOOGLE_APPS_SCRIPT_URL ในโปรแกรม');
+                    return;
+                }
+                
+                // ทดสอบการเชื่อมต่อ Google Apps Script
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=test`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    statusElement.innerHTML = '✅ เชื่อมต่อสำเร็จ';
+                    statusElement.className = 'status-indicator success';
+                    alert('✅ การเชื่อมต่อ Google Sheets สำเร็จ!\n\nสามารถอ่านและเขียนข้อมูลได้ปกติ');
+                } else {
+                    throw new Error(result.message || 'Unknown error');
+                }
+                
+            } catch (error) {
+                console.error('Google Sheets connection test failed:', error);
+                statusElement.innerHTML = '❌ เชื่อมต่อล้มเหลว';
+                statusElement.className = 'status-indicator error';
+                alert(`❌ การเชื่อมต่อ Google Sheets ล้มเหลว!\n\nข้อผิดพลาด: ${error.message}\n\nกรุณาตรวจสอบ:\n1. Google Apps Script ได้ Deploy แล้ว\n2. URL ถูกต้อง\n3. การตั้งค่า "Who has access: Anyone"`);
+            }
+        }
+
+        function openGoogleSheets() {
+            window.open(GOOGLE_SHEETS_URL, '_blank');
+        }
+
+        function updateAppsScriptUrl() {
+            const urlInput = document.getElementById('appsScriptUrl');
+            const newUrl = urlInput.value.trim();
+            
+            if (!newUrl) {
+                alert('กรุณาใส่ Apps Script URL');
+                return;
+            }
+            
+            if (newUrl === 'YOUR_WEB_APP_URL_HERE') {
+                alert('กรุณาใส่ URL ที่ถูกต้องจาก Google Apps Script');
+                return;
+            }
+            
+            // อัปเดต URL ในโปรแกรม (ในความเป็นจริงจะต้องอัปเดตในไฟล์)
+            // สำหรับตอนนี้จะเก็บใน localStorage
+            localStorage.setItem('mn_apps_script_url', newUrl);
+            
+            alert('✅ อัปเดต Apps Script URL เรียบร้อย!\n\nกรุณา Refresh หน้าเว็บเพื่อให้การเปลี่ยนแปลงมีผล');
+        }
+
+        function showSetupInstructions() {
+            const instructions = `
+🚀 วิธีติดตั้ง Google Apps Script:
+
+1. เปิด Google Sheets:
+   ${GOOGLE_SHEETS_URL}
+
+2. ไปที่ Extensions > Apps Script
+
+3. ลบโค้ดเดิมและวางโค้ดจากไฟล์:
+   google_apps_script.js
+
+4. คลิก Deploy > New deployment
+   - Type: Web app
+   - Execute as: Me
+   - Who has access: Anyone
+
+5. คัดลอก Web App URL และวางในช่องด้านบน
+
+6. คลิก "ทดสอบการเชื่อมต่อ"
+
+📁 ไฟล์ที่ต้องใช้:
+- google_apps_script.js (โค้ด Apps Script)
+- GOOGLE_APPS_SCRIPT_SETUP.md (คู่มือละเอียด)
+            `;
+            
+            alert(instructions);
+        }
+
+        function updateDataStats() {
+            const dataStats = document.getElementById('dataStats');
+            const drawStats = document.getElementById('drawStats');
+            
+            if (dataStats) {
+                const totalMatches = 159;
+                const completedMatches = calculateCompletedMatches();
+                dataStats.textContent = `เสร็จแล้ว ${completedMatches}/${totalMatches} แมท`;
+            }
+            
+            if (drawStats) {
+                const totalDraws = Object.keys(drawOverrides).length;
+                const totalHistory = drawHistory.length;
+                drawStats.textContent = `คู่ประกบ ${totalDraws} แมท, ประวัติ ${totalHistory} รายการ`;
+            }
+        }
+
+        function calculateCompletedMatches() {
+            const categories = ['A', 'B', 'C-B', 'C-C', 'D', 'ใหม่', 'ผสม'];
+            let completed = 0;
+            
+            categories.forEach(category => {
+                const categoryData = getCategoryData(category);
+                
+                // Count completed matches in groups
+                categoryData.groups.forEach(group => {
+                    group.matches.forEach(match => {
+                        if (match.completed) completed++;
+                    });
+                });
+                
+                // Count completed knockout matches
+                categoryData.knockoutMatches.forEach(match => {
+                    if (match.completed) completed++;
+                });
+                
+                // Count completed finals
+                categoryData.finals.forEach(match => {
+                    if (match.completed) completed++;
+                });
+            });
+            
+            return completed;
+        }
+
         function generateMatchTableRow(match) {
             const statusClass = match.completed ? 'completed' : 'pending';
             const statusText = match.completed ? 'เสร็จแล้ว' : 'รอการแข่งขัน';
@@ -4248,6 +5625,13 @@
                 }
             });
             
+            // Add event listener for reset password Enter key
+            document.addEventListener('keypress', function(e) {
+                if (e.target && e.target.id === 'resetPassword' && e.key === 'Enter') {
+                    confirmReset();
+                }
+            });
+            
             document.getElementById('adminModal').addEventListener('click', function(e) {
                 if (e.target === this) {
                     closeAdminModal();
@@ -4257,6 +5641,13 @@
             document.getElementById('scoreModal').addEventListener('click', function(e) {
                 if (e.target === this) {
                     closeScoreModal();
+                }
+            });
+            
+            // Add event listener for reset modal
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'resetModal') {
+                    closeResetModal();
                 }
             });
             
