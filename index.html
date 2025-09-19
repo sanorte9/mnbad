@@ -3332,12 +3332,17 @@
             loadAdminMatches();
         }
 
-        async function loadCategory(cat) {
+        async function loadCategory(cat, fromRefresh = false) {
             document.querySelectorAll('.category-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             
-            event.target.closest('.category-btn').classList.add('active');
+            // หาปุ่มที่ถูกต้องสำหรับประเภทนี้
+            const categoryBtn = document.querySelector(`[onclick="loadCategory('${cat}')"]`);
+            if (categoryBtn) {
+                categoryBtn.classList.add('active');
+            }
+            
             currentCategory = cat;
             
             const contentArea = document.getElementById('contentArea');
@@ -5550,11 +5555,39 @@
             document.getElementById('allMatchesTable').innerHTML = generateAllMatchesTable(filteredMatches);
         }
 
+        // ฟังก์ชันทดสอบการเชื่อมต่อแบบง่าย
+        async function testConnection() {
+            try {
+                console.log('Testing connection to:', GOOGLE_APPS_SCRIPT_URL);
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=test`);
+                const result = await response.json();
+                console.log('Connection test result:', result);
+                return result.status === 'success';
+            } catch (error) {
+                console.error('Connection test failed:', error);
+                return false;
+            }
+        }
+
         async function refreshData() {
+            console.log('=== REFRESH DEBUG START ===');
+            console.log('Current category:', currentCategory);
+            console.log('Google Apps Script URL:', GOOGLE_APPS_SCRIPT_URL);
+            
             if (!currentCategory) {
                 console.log('No category selected for refresh');
+                alert('⚠️ กรุณาเลือกประเภทการแข่งขันก่อน');
                 return;
             }
+            
+            // ทดสอบการเชื่อมต่อก่อน
+            console.log('Testing connection...');
+            const connectionOk = await testConnection();
+            if (!connectionOk) {
+                alert('⚠️ ไม่สามารถเชื่อมต่อ Google Apps Script ได้\n\nกรุณาตรวจสอบ:\n• การเชื่อมต่ออินเทอร์เน็ต\n• Google Apps Script URL\n• การตั้งค่า Web App');
+                return;
+            }
+            console.log('Connection test passed');
             
             const refreshBtn = document.querySelector('.refresh-btn');
             const originalContent = refreshBtn.innerHTML;
@@ -5572,7 +5605,9 @@
                 
                 // รีเฟรชข้อมูล
                 console.log('Refreshing data for category:', currentCategory);
-                await loadCategory(currentCategory);
+                console.log('Calling loadCategory with fromRefresh=true');
+                await loadCategory(currentCategory, true);
+                console.log('loadCategory completed successfully');
                 
                 // แสดงสถานะสำเร็จ
                 refreshBtn.innerHTML = '✅';
@@ -5588,15 +5623,30 @@
                 }, 2000);
                 
             } catch (error) {
+                console.error('=== REFRESH ERROR ===');
                 console.error('Error refreshing data:', error);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
                 
                 // แสดงสถานะข้อผิดพลาด
                 refreshBtn.innerHTML = '❌';
                 refreshBtn.title = 'รีเฟรชล้มเหลว!';
                 refreshBtn.className = 'refresh-btn error';
                 
-                // แสดงข้อความแจ้งเตือน
-                alert('⚠️ ไม่สามารถรีเฟรชข้อมูลได้\n\nกรุณาลองใหม่อีกครั้ง หรือตรวจสอบการเชื่อมต่อ');
+                // แสดงข้อความแจ้งเตือนที่ละเอียดขึ้น
+                let errorMessage = '⚠️ ไม่สามารถรีเฟรชข้อมูลได้\n\n';
+                if (error.message.includes('fetch')) {
+                    errorMessage += '• ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต\n';
+                    errorMessage += '• ตรวจสอบ Google Apps Script URL\n';
+                } else if (error.message.includes('JSON')) {
+                    errorMessage += '• ข้อมูลที่ได้รับไม่ถูกต้อง\n';
+                    errorMessage += '• ตรวจสอบ Google Sheets\n';
+                } else {
+                    errorMessage += `• ข้อผิดพลาด: ${error.message}\n`;
+                }
+                errorMessage += '\nกรุณาลองใหม่อีกครั้ง';
+                
+                alert(errorMessage);
                 
                 // รีเซ็ตปุ่มหลังจาก 3 วินาที
                 setTimeout(() => {
