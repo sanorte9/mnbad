@@ -745,6 +745,25 @@
             100% { transform: scale(1); }
         }
 
+        .error-message {
+            background: #fdf2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .error-message h4 {
+            color: #e74c3c;
+            margin: 0 0 10px 0;
+        }
+
+        .error-message p {
+            color: #666;
+            margin: 0 0 15px 0;
+        }
+
         .nav-tabs {
             display: flex;
             margin-bottom: 15px;
@@ -2256,30 +2275,30 @@
             color: #155724;
         }
 
-        .shuttlecock-cost {
-            background: #fff3cd;
+        .court-selection {
+            background: #e3f2fd;
             padding: 15px;
             border-radius: 8px;
-            border-left: 4px solid #ffc107;
+            border-left: 4px solid #2196f3;
         }
 
-        .shuttlecock-cost label {
+        .court-selection label {
             display: block;
             font-weight: 600;
             color: #333;
             margin-bottom: 8px;
         }
 
-        .shuttlecock-input-group {
+        .court-input-group {
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        .shuttlecock-input {
-            width: 80px;
+        .court-select {
+            width: 100px;
             padding: 8px;
-            border: 2px solid #ffc107;
+            border: 2px solid #2196f3;
             border-radius: 6px;
             text-align: center;
             font-size: 16px;
@@ -2462,11 +2481,18 @@
                         <div class="winner-display" id="winnerDisplay"></div>
                     </div>
 
-                    <div class="shuttlecock-cost">
-                        <label for="shuttlecockCount">จำนวนลูกแบด:</label>
-                        <div class="shuttlecock-input-group">
-                            <input type="number" id="shuttlecockCount" class="shuttlecock-input" min="0" value="1">
-                            <span class="cost-display">ค่าใช้จ่าย: <span id="totalCost">40</span> บาท/ทีม</span>
+                    <div class="court-selection">
+                        <label for="courtNumber">คอร์ดที่แข่ง:</label>
+                        <div class="court-input-group">
+                            <select id="courtNumber" class="court-select">
+                                <option value="">เลือกคอร์ด</option>
+                                <option value="1">คอร์ด 1</option>
+                                <option value="2">คอร์ด 2</option>
+                                <option value="3">คอร์ด 3</option>
+                                <option value="4">คอร์ด 4</option>
+                                <option value="5">คอร์ด 5</option>
+                                <option value="6">คอร์ด 6</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -2718,7 +2744,7 @@
             return content;
         }
 
-        function loadAdminMatches() {
+        async function loadAdminMatches() {
             const category = document.getElementById('adminCategorySelect').value;
             const matchesList = document.getElementById('adminMatchesList');
             
@@ -2728,11 +2754,18 @@
                 return;
             }
             
-            const categoryData = getCategoryData(category);
+            // แสดงสถานะการโหลด
+            matchesList.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>กำลังโหลดข้อมูลแมท...</div></div>';
+            
+            try {
+                // ดึงข้อมูลจาก Google Sheets
+                const categoryData = await getCategoryData(category);
             currentAdminMatches = [];
             
             // รวบรวมแมทรอบแรก
+                if (categoryData.groups) {
             categoryData.groups.forEach(group => {
+                        if (group.matches) {
                 group.matches.forEach(match => {
                     currentAdminMatches.push({
                         ...match,
@@ -2740,9 +2773,12 @@
                         group: group.name
                     });
                 });
+                        }
             });
+                }
             
             // รวบรวมแมทน็อกเอาท์ - แยกเป็นรอบ 8 ทีม และ 4 ทีม
+                if (categoryData.knockoutMatches) {
             categoryData.knockoutMatches.forEach((match, index) => {
                 let roundName = 'รอบ 8 ทีม';
                 
@@ -2764,8 +2800,10 @@
                     group: null
                 });
             });
+                }
             
             // รวบรวมแมทชิงชนะเลิศ
+                if (categoryData.finals) {
             categoryData.finals.forEach(match => {
                 currentAdminMatches.push({
                     ...match,
@@ -2773,12 +2811,24 @@
                     group: null
                 });
             });
+                }
             
             // Reset round selector
             document.getElementById('adminRoundSelect').value = '';
             
             // แสดงรายการแมททั้งหมด
             displayFilteredMatches(currentAdminMatches, category);
+                
+            } catch (error) {
+                console.error('Error loading admin matches:', error);
+                matchesList.innerHTML = `
+                    <div class="error-message">
+                        <h4>❌ ไม่สามารถโหลดข้อมูลแมทได้</h4>
+                        <p>ข้อผิดพลาด: ${error.message}</p>
+                        <button class="btn" onclick="loadAdminMatches()">ลองใหม่</button>
+                    </div>
+                `;
+            }
         }
 
         function filterMatchesByRound() {
@@ -2992,7 +3042,10 @@
         }
 
         function editMatchHandler(matchId) {
+            console.log('=== EDIT MATCH HANDLER ===');
             console.log('Edit match handler called for:', matchId);
+            console.log('Current admin matches length:', currentAdminMatches ? currentAdminMatches.length : 'undefined');
+            console.log('Available matches:', currentAdminMatches ? currentAdminMatches.map(m => m.id) : 'none');
             editMatch(matchId);
         }
 
@@ -3014,13 +3067,15 @@
         }
 
         function openScoreModal(matchId, isEdit) {
+            console.log('=== OPEN SCORE MODAL ===');
             console.log('Opening score modal for:', matchId, 'isEdit:', isEdit);
             
             const match = findMatchById(matchId);
             console.log('Found match:', match);
             
             if (!match) {
-                alert('ไม่พบข้อมูลแมท: ' + matchId);
+                console.error('Match not found:', matchId);
+                alert('ไม่พบข้อมูลแมท: ' + matchId + '\n\nกรุณาเลือกประเภทการแข่งขันก่อน');
                 return;
             }
 
@@ -3056,22 +3111,21 @@
             addScoreInputListeners();
         }
 
+        // ฟังก์ชันค้นหาแมทจาก currentAdminMatches (ใช้ข้อมูลที่โหลดแล้ว)
         function findMatchById(matchId) {
-            const categories = ['A', 'B', 'C-B', 'C-C', 'D', 'ใหม่', 'ผสม'];
+            console.log('Searching for match:', matchId);
+            console.log('Current admin matches:', currentAdminMatches);
             
-            for (const category of categories) {
-                const categoryData = getCategoryData(category);
-                
-                // Search in round robin matches
-                for (const group of categoryData.groups) {
-                    if (group.matches) {
-                        const match = group.matches.find(m => m.id === matchId);
+            if (!currentAdminMatches || currentAdminMatches.length === 0) {
+                console.log('No admin matches loaded');
+                return null;
+            }
+            
+            const match = currentAdminMatches.find(m => m.id === matchId);
                         if (match) {
+                console.log('Found match:', match);
                             return { 
                                 ...match, 
-                                category, 
-                                round: 'รอบแรก', 
-                                group: group.name,
                                 // Ensure arrays exist
                                 score1: match.score1 || [],
                                 score2: match.score2 || [],
@@ -3079,45 +3133,9 @@
                                 sets2: match.sets2 || 0,
                                 completed: match.completed || false
                             };
-                        }
-                    }
-                }
-                
-                // Search in knockout matches
-                if (categoryData.knockoutMatches) {
-                    const knockoutMatch = categoryData.knockoutMatches.find(m => m.id === matchId);
-                    if (knockoutMatch) {
-                        return { 
-                            ...knockoutMatch, 
-                            category, 
-                            round: 'น็อกเอาท์',
-                            score1: knockoutMatch.score1 || [],
-                            score2: knockoutMatch.score2 || [],
-                            sets1: knockoutMatch.sets1 || 0,
-                            sets2: knockoutMatch.sets2 || 0,
-                            completed: knockoutMatch.completed || false
-                        };
-                    }
-                }
-                
-                // Search in finals
-                if (categoryData.finals) {
-                    const finalMatch = categoryData.finals.find(m => m.id === matchId);
-                    if (finalMatch) {
-                        return { 
-                            ...finalMatch, 
-                            category, 
-                            round: finalMatch.type === 'championship' ? 'ชิงชนะเลิศ' : 'ชิงอันดับ 3',
-                            score1: finalMatch.score1 || [],
-                            score2: finalMatch.score2 || [],
-                            sets1: finalMatch.sets1 || 0,
-                            sets2: finalMatch.sets2 || 0,
-                            completed: finalMatch.completed || false
-                        };
-                    }
-                }
             }
             
+            console.log('Match not found');
             return null;
         }
 
@@ -3137,9 +3155,8 @@
                 document.getElementById('set3Team2').value = match.score2[2] || '';
             }
             
-            // Set shuttlecock count (mock default)
-            document.getElementById('shuttlecockCount').value = 1;
-            updateCostDisplay();
+            // Set court number (default to empty)
+            document.getElementById('courtNumber').value = '';
             
             // Set the existing sets count directly from match data
             document.getElementById('team1Sets').textContent = match.sets1 || 0;
@@ -3171,7 +3188,7 @@
             document.getElementById('set2Team2').value = '';
             document.getElementById('set3Team1').value = '';
             document.getElementById('set3Team2').value = '';
-            document.getElementById('shuttlecockCount').value = 1;
+            document.getElementById('courtNumber').value = '';
             
             // Reset score summary
             document.getElementById('team1Sets').textContent = '0';
@@ -3192,11 +3209,7 @@
                 input.addEventListener('input', updateScoreSummary);
             });
             
-            const shuttlecockInput = document.getElementById('shuttlecockCount');
-            if (shuttlecockInput) {
-                shuttlecockInput.removeEventListener('input', updateCostDisplay);
-                shuttlecockInput.addEventListener('input', updateCostDisplay);
-            }
+            // Court selection doesn't need event listeners
             
             console.log('Score input listeners added');
         }
@@ -3254,18 +3267,74 @@
             }
         }
 
-        function updateCostDisplay() {
-            const count = parseInt(document.getElementById('shuttlecockCount').value) || 0;
-            const cost = count * 40; // 80 บาทหารครึ่ง = 40 บาท/ทีม
-            document.getElementById('totalCost').textContent = cost;
-        }
+        // Removed updateCostDisplay function - no longer needed
 
         function closeScoreModal() {
             document.getElementById('scoreModal').style.display = 'none';
             window.currentEditMatch = null;
         }
 
-        function saveMatchScore() {
+        // ฟังก์ชันอัปเดตข้อมูลแมทใน Google Sheets
+        async function updateMatchInSheets(matchData) {
+            try {
+                console.log('=== UPDATE MATCH DEBUG ===');
+                console.log('Google Apps Script URL:', GOOGLE_APPS_SCRIPT_URL);
+                console.log('Match data to update:', matchData);
+                
+                // ตรวจสอบ URL
+                if (!GOOGLE_APPS_SCRIPT_URL || GOOGLE_APPS_SCRIPT_URL === 'YOUR_WEB_APP_URL_HERE') {
+                    throw new Error('Google Apps Script URL ไม่ได้ตั้งค่า');
+                }
+                
+                // สร้าง URL parameters สำหรับ GET request
+                const params = new URLSearchParams({
+                    action: 'updateMatch',
+                    matchId: matchData.matchId,
+                    set1T1: matchData['Set1 T1'] || '',
+                    set1T2: matchData['Set1 T2'] || '',
+                    set2T1: matchData['Set2 T1'] || '',
+                    set2T2: matchData['Set2 T2'] || '',
+                    set3T1: matchData['Set3 T1'] || '',
+                    set3T2: matchData['Set3 T2'] || '',
+                    winnerId: matchData['Winner ID'] || '',
+                    court: matchData['Court'] || '',
+                    status: matchData['Status'] || ''
+                });
+                
+                const requestUrl = `${GOOGLE_APPS_SCRIPT_URL}?${params.toString()}`;
+                console.log('Request URL:', requestUrl);
+                
+                const response = await fetch(requestUrl, {
+                    method: 'GET'
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                console.log('Update result:', result);
+
+                if (result.status === 'success') {
+                    return { success: true, message: result.message };
+                } else {
+                    return { success: false, message: result.message };
+                }
+
+            } catch (error) {
+                console.error('=== UPDATE ERROR ===');
+                console.error('Error updating match in Google Sheets:', error);
+                console.error('Error name:', error.name);
+                console.error('Error message:', error.message);
+                
+                return { success: false, message: error.message };
+            }
+        }
+
+        async function saveMatchScore() {
             if (!window.currentEditMatch) return;
 
             const sets = [
@@ -3320,16 +3389,69 @@
                 return;
             }
 
-            const shuttlecockCount = parseInt(document.getElementById('shuttlecockCount').value) || 0;
-            const costPerTeam = shuttlecockCount * 40;
+            const courtNumber = document.getElementById('courtNumber').value;
 
-            // Here would be the actual save to database
-            alert(`บันทึกผลสำเร็จ!\n\nแมท: ${window.currentEditMatch.matchId}\nผลการแข่งขัน: ${team1Sets}-${team2Sets}\nค่าลูกแบด: ${costPerTeam} บาท/ทีม\n\n(การบันทึกจริงจะเชื่อมต่อ Google Sheets)`);
+            // กำหนดผู้ชนะ
+            const winner = team1Sets > team2Sets ? window.currentEditMatch.team1 : window.currentEditMatch.team2;
 
-            closeScoreModal();
+            // เตรียมข้อมูลสำหรับบันทึกลง Google Sheets
+            const matchData = {
+                matchId: window.currentEditMatch.matchId,
+                'Set1 T1': sets[0].team1,
+                'Set1 T2': sets[0].team2,
+                'Set2 T1': sets[1].team1,
+                'Set2 T2': sets[1].team2,
+                'Set3 T1': sets[2].team1,
+                'Set3 T2': sets[2].team2,
+                'Winner ID': winner,
+                'Court': courtNumber,
+                'Status': 'completed'
+            };
             
-            // Refresh the matches list
-            loadAdminMatches();
+            console.log('Prepared match data:', matchData);
+
+            // แสดงสถานะการบันทึก
+            const saveBtn = document.querySelector('.btn-save');
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = 'กำลังบันทึก...';
+            saveBtn.disabled = true;
+
+            try {
+                // บันทึกลง Google Sheets
+                const result = await updateMatchInSheets(matchData);
+                
+                if (result.success) {
+                    const courtText = courtNumber ? `\nคอร์ด: ${courtNumber}` : '';
+                    alert(`✅ บันทึกผลสำเร็จ!\n\nแมท: ${window.currentEditMatch.matchId}\nผลการแข่งขัน: ${team1Sets}-${team2Sets}${courtText}\n\nข้อมูลได้ถูกบันทึกลง Google Sheets แล้ว`);
+                    closeScoreModal();
+                    
+                    // ล้าง cache และรีเฟรชข้อมูล
+                    const category = document.getElementById('adminCategorySelect').value;
+                    if (category) {
+                        clearCategoryCache(category);
+                        console.log('Cache cleared for category:', category);
+                    }
+                    
+                    // แสดงสถานะการรีเฟรช
+                    const matchesList = document.getElementById('adminMatchesList');
+                    matchesList.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>กำลังรีเฟรชข้อมูลหลังบันทึก...</div></div>';
+                    
+                    // รีเฟรชข้อมูลหลัง 0.5 วินาที
+                    setTimeout(() => {
+                        console.log('Auto-refreshing admin matches after save...');
+                        loadAdminMatches();
+                    }, 500);
+                } else {
+                    alert(`❌ ไม่สามารถบันทึกข้อมูลได้\n\nข้อผิดพลาด: ${result.message}\n\nกรุณาลองใหม่อีกครั้ง`);
+                }
+            } catch (error) {
+                console.error('Error saving match score:', error);
+                alert(`❌ เกิดข้อผิดพลาดในการบันทึก\n\nข้อผิดพลาด: ${error.message}\n\nกรุณาลองใหม่อีกครั้ง`);
+            } finally {
+                // รีเซ็ตปุ่ม
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+            }
         }
 
         async function loadCategory(cat, fromRefresh = false) {
@@ -3822,16 +3944,20 @@
                     return team1InGroup && team2InGroup;
                 });
 
-                groups[groupName].matches = groupMatches.map(m => ({
-                    id: m.match_id,
-                    team1: m.team1_name,
-                    team2: m.team2_name,
-                    score1: [m.set1_team1, m.set2_team1, m.set3_team1].filter(s => s > 0),
-                    score2: [m.set1_team2, m.set2_team2, m.set3_team2].filter(s => s > 0),
-                    sets1: m.set1_team1 > m.set1_team2 ? 1 : 0 + (m.set2_team1 > m.set2_team2 ? 1 : 0) + (m.set3_team1 > m.set3_team2 ? 1 : 0),
-                    sets2: m.set1_team2 > m.set1_team1 ? 1 : 0 + (m.set2_team2 > m.set2_team1 ? 1 : 0) + (m.set3_team2 > m.set3_team1 ? 1 : 0),
-                    completed: m.match_status === 'completed'
-                }));
+                groups[groupName].matches = groupMatches.map(m => {
+                    const convertedMatch = {
+                        id: m.match_id,
+                        team1: m.team1_name,
+                        team2: m.team2_name,
+                        score1: [m.set1_team1, m.set2_team1, m.set3_team1].filter(s => s > 0),
+                        score2: [m.set1_team2, m.set2_team2, m.set3_team2].filter(s => s > 0),
+                        sets1: (m.set1_team1 > m.set1_team2 ? 1 : 0) + (m.set2_team1 > m.set2_team2 ? 1 : 0) + (m.set3_team1 > m.set3_team2 ? 1 : 0),
+                        sets2: (m.set1_team2 > m.set1_team1 ? 1 : 0) + (m.set2_team2 > m.set2_team1 ? 1 : 0) + (m.set3_team2 > m.set3_team1 ? 1 : 0),
+                        completed: m.match_status === 'completed'
+                    };
+                    console.log('Converting round robin match:', m.match_id, '->', convertedMatch);
+                    return convertedMatch;
+                });
             });
 
             // แปลง knockout matches
@@ -3841,8 +3967,8 @@
                 team2: m.team2_name,
                 score1: [m.set1_team1, m.set2_team1, m.set3_team1].filter(s => s > 0),
                 score2: [m.set1_team2, m.set2_team2, m.set3_team2].filter(s => s > 0),
-                sets1: m.set1_team1 > m.set1_team2 ? 1 : 0 + (m.set2_team1 > m.set2_team2 ? 1 : 0) + (m.set3_team1 > m.set3_team2 ? 1 : 0),
-                sets2: m.set1_team2 > m.set1_team1 ? 1 : 0 + (m.set2_team2 > m.set2_team1 ? 1 : 0) + (m.set3_team2 > m.set3_team1 ? 1 : 0),
+                sets1: (m.set1_team1 > m.set1_team2 ? 1 : 0) + (m.set2_team1 > m.set2_team2 ? 1 : 0) + (m.set3_team1 > m.set3_team2 ? 1 : 0),
+                sets2: (m.set1_team2 > m.set1_team1 ? 1 : 0) + (m.set2_team2 > m.set2_team1 ? 1 : 0) + (m.set3_team2 > m.set3_team1 ? 1 : 0),
                 completed: m.match_status === 'completed'
             }));
 
@@ -3854,8 +3980,8 @@
                 team2: m.team2_name,
                 score1: [m.set1_team1, m.set2_team1, m.set3_team1].filter(s => s > 0),
                 score2: [m.set1_team2, m.set2_team2, m.set3_team2].filter(s => s > 0),
-                sets1: m.set1_team1 > m.set1_team2 ? 1 : 0 + (m.set2_team1 > m.set2_team2 ? 1 : 0) + (m.set3_team1 > m.set3_team2 ? 1 : 0),
-                sets2: m.set1_team2 > m.set1_team1 ? 1 : 0 + (m.set2_team2 > m.set2_team1 ? 1 : 0) + (m.set3_team2 > m.set3_team1 ? 1 : 0),
+                sets1: (m.set1_team1 > m.set1_team2 ? 1 : 0) + (m.set2_team1 > m.set2_team2 ? 1 : 0) + (m.set3_team1 > m.set3_team2 ? 1 : 0),
+                sets2: (m.set1_team2 > m.set1_team1 ? 1 : 0) + (m.set2_team2 > m.set2_team1 ? 1 : 0) + (m.set3_team2 > m.set3_team1 ? 1 : 0),
                 completed: m.match_status === 'completed'
             }));
 
@@ -5147,7 +5273,7 @@
         const GOOGLE_SHEETS_ID = '1xtwqAxLOdKJknKxxYCNQ14Vm2inMIfuKg5Xddsy69rw';
         
         // Google Apps Script Web App URL - ต้องอัปเดตหลังจาก Deploy
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0MX9n8pxxurUmv9lrhpCK0hu8RLlo3f1gT0D9PLWQrJNquwngETlPlQCyJUrCOD3IYg/exec';
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYx7ycrF9Uhv6HP3K2zgD5wCwW_uaZckiq6wZey0_a7BofZlkKHQ1wqBQ8ggWgmAcqTg/exec';
 
         function generateSettingsContent() {
             return `
