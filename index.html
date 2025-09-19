@@ -260,10 +260,6 @@
             padding: 20px;
             text-align: center;
             margin: -20px -20px 20px -20px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .bracket-title {
@@ -275,41 +271,6 @@
         .bracket-stats {
             font-size: 14px;
             opacity: 0.9;
-        }
-
-        .refresh-btn {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .refresh-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: translateY(-50%) scale(1.05);
-        }
-
-        .refresh-btn:active {
-            transform: translateY(-50%) scale(0.95);
-        }
-
-        .refresh-btn.loading {
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: translateY(-50%) rotate(0deg); }
-            to { transform: translateY(-50%) rotate(360deg); }
         }
 
         .tabs-container {
@@ -749,6 +710,39 @@
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .refresh-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+        }
+
+        .refresh-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+        }
+
+        .refresh-btn.loading {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            animation: pulse 1s infinite;
+        }
+
+        .refresh-btn.success {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        }
+
+        .refresh-btn.error {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .nav-tabs {
@@ -1710,12 +1704,6 @@
                 margin: -30px -30px 30px -30px;
             }
             
-            .refresh-btn {
-                right: 30px;
-                padding: 10px 14px;
-                font-size: 18px;
-            }
-            
             .bracket-title {
                 font-size: 28px;
             }
@@ -1822,12 +1810,6 @@
             .bracket-header {
                 padding: 15px;
                 margin: -15px -15px 15px -15px;
-            }
-            
-            .refresh-btn {
-                right: 15px;
-                padding: 6px 10px;
-                font-size: 14px;
             }
             
             .bracket-title {
@@ -3690,13 +3672,8 @@
             contentArea.innerHTML = `
                 <div class="bracket-container">
                     <div class="bracket-header">
-                        <div class="bracket-content">
-                            <h2 class="bracket-title">${categoryName}</h2>
-                            <div class="bracket-stats">${stats}</div>
-                        </div>
-                        <button class="refresh-btn" onclick="refreshCategory('${categoryKey}')" title="รีเฟรชข้อมูล">
-                            🔄
-                        </button>
+                        <h2 class="bracket-title">${categoryName}</h2>
+                        <div class="bracket-stats">${stats}</div>
                     </div>
                     <div class="tabs-container">
                         <div class="tabs-nav">
@@ -3727,45 +3704,6 @@
                     }
                 }
             }, 100);
-        }
-
-        // ฟังก์ชันรีเฟรชข้อมูล
-        async function refreshCategory(categoryKey) {
-            const refreshBtn = document.querySelector('.refresh-btn');
-            const originalIcon = refreshBtn.innerHTML;
-            
-            try {
-                // แสดง loading animation
-                refreshBtn.classList.add('loading');
-                refreshBtn.innerHTML = '⏳';
-                refreshBtn.disabled = true;
-                
-                // ล้าง cache ของประเภทนี้
-                const cacheKey = `category_${categoryKey}`;
-                localStorage.removeItem(cacheKey);
-                
-                // รีเฟรชข้อมูล
-                await loadCategory(categoryKey);
-                
-                // แสดง success animation
-                refreshBtn.innerHTML = '✅';
-                setTimeout(() => {
-                    refreshBtn.innerHTML = originalIcon;
-                    refreshBtn.classList.remove('loading');
-                    refreshBtn.disabled = false;
-                }, 1000);
-                
-            } catch (error) {
-                console.error('Error refreshing category:', error);
-                
-                // แสดง error animation
-                refreshBtn.innerHTML = '❌';
-                setTimeout(() => {
-                    refreshBtn.innerHTML = originalIcon;
-                    refreshBtn.classList.remove('loading');
-                    refreshBtn.disabled = false;
-                }, 2000);
-            }
         }
 
         async function switchTab(category, tab) {
@@ -5612,9 +5550,61 @@
             document.getElementById('allMatchesTable').innerHTML = generateAllMatchesTable(filteredMatches);
         }
 
-        function refreshData() {
-            if (currentCategory) {
-                loadCategory(currentCategory);
+        async function refreshData() {
+            if (!currentCategory) {
+                console.log('No category selected for refresh');
+                return;
+            }
+            
+            const refreshBtn = document.querySelector('.refresh-btn');
+            const originalContent = refreshBtn.innerHTML;
+            
+            try {
+                // แสดงสถานะการรีเฟรช
+                refreshBtn.innerHTML = '⏳';
+                refreshBtn.disabled = true;
+                refreshBtn.title = 'กำลังรีเฟรช...';
+                refreshBtn.className = 'refresh-btn loading';
+                
+                // ล้างแคชของประเภทปัจจุบัน
+                console.log('Clearing cache for category:', currentCategory);
+                clearCategoryCache(currentCategory);
+                
+                // รีเฟรชข้อมูล
+                console.log('Refreshing data for category:', currentCategory);
+                await loadCategory(currentCategory);
+                
+                // แสดงสถานะสำเร็จ
+                refreshBtn.innerHTML = '✅';
+                refreshBtn.title = 'รีเฟรชสำเร็จ!';
+                refreshBtn.className = 'refresh-btn success';
+                
+                // รีเซ็ตปุ่มหลังจาก 2 วินาที
+                setTimeout(() => {
+                    refreshBtn.innerHTML = originalContent;
+                    refreshBtn.disabled = false;
+                    refreshBtn.title = 'รีเฟรชข้อมูล';
+                    refreshBtn.className = 'refresh-btn';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                
+                // แสดงสถานะข้อผิดพลาด
+                refreshBtn.innerHTML = '❌';
+                refreshBtn.title = 'รีเฟรชล้มเหลว!';
+                refreshBtn.className = 'refresh-btn error';
+                
+                // แสดงข้อความแจ้งเตือน
+                alert('⚠️ ไม่สามารถรีเฟรชข้อมูลได้\n\nกรุณาลองใหม่อีกครั้ง หรือตรวจสอบการเชื่อมต่อ');
+                
+                // รีเซ็ตปุ่มหลังจาก 3 วินาที
+                setTimeout(() => {
+                    refreshBtn.innerHTML = originalContent;
+                    refreshBtn.disabled = false;
+                    refreshBtn.title = 'รีเฟรชข้อมูล';
+                    refreshBtn.className = 'refresh-btn';
+                }, 3000);
             }
         }
 
