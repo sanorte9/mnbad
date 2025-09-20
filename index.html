@@ -400,7 +400,7 @@
 
         .table-header {
             display: grid;
-            grid-template-columns: 35px 1fr 35px 35px 35px 35px 45px 45px;
+            grid-template-columns: 1fr 35px 35px 35px 35px 45px;
             gap: 6px;
             padding: 8px 12px;
             background: #e9ecef;
@@ -411,7 +411,7 @@
 
         .team-row {
             display: grid;
-            grid-template-columns: 35px 1fr 35px 35px 35px 35px 45px 45px;
+            grid-template-columns: 1fr 35px 35px 35px 35px 45px;
             gap: 6px;
             padding: 8px 12px;
             border-bottom: 1px solid #f1f3f4;
@@ -452,11 +452,19 @@
             text-align: center;
         }
         
+        .table-header span {
+            text-align: center;
+        }
+        
+        .table-header span:nth-child(1) {
+            text-align: left;
+        }
+        
         .team-row span {
             text-align: center;
         }
         
-        .team-row span:nth-child(2) {
+        .team-row span:nth-child(1) {
             text-align: left;
         }
 
@@ -1771,14 +1779,14 @@
             }
             
             .table-header {
-                grid-template-columns: 30px 2fr 25px 25px 25px 25px 30px 30px;
+                grid-template-columns: 1fr 25px 25px 25px 25px 30px;
                 gap: 4px;
                 padding: 8px 10px;
                 font-size: 10px;
             }
             
             .team-row {
-                grid-template-columns: 30px 2fr 25px 25px 25px 25px 30px 30px;
+                grid-template-columns: 1fr 25px 25px 25px 25px 30px;
                 gap: 4px;
                 padding: 8px 10px;
                 font-size: 11px;
@@ -1799,14 +1807,14 @@
             }
             
             .table-header {
-                grid-template-columns: 35px 2fr 30px 30px 30px 30px 40px 40px;
+                grid-template-columns: 1fr 30px 30px 30px 30px 40px;
                 gap: 5px;
                 padding: 10px 12px;
                 font-size: 11px;
             }
             
             .team-row {
-                grid-template-columns: 35px 2fr 30px 30px 30px 30px 40px 40px;
+                grid-template-columns: 1fr 30px 30px 30px 30px 40px;
                 gap: 5px;
                 padding: 10px 12px;
                 font-size: 12px;
@@ -5083,20 +5091,18 @@
                         <div class="group-title">${group.name}</div>
                         <div class="standings-table">
                             <div class="table-header">
-                                <span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>เสมอ</span><span>แพ้</span><span>คะแนน</span><span>แต้ม</span>
+                                <span>ทีม</span><span>แมท</span><span>ชนะ</span><span>เสมอ</span><span>แพ้</span><span>คะแนน</span>
                             </div>`;
                             
                 group.teams.forEach(team => {
                     content += `
                         <div class="team-row">
-                            <span class="rank">${team.rank}</span>
                             <span class="team-name">${team.name}</span>
                             <span>${team.matches}</span>
                             <span>${team.wins}</span>
                             <span>${team.draws || 0}</span>
                             <span>${team.losses || 0}</span>
                             <span class="points">${team.points}</span>
-                            <span class="total-points">${team.totalPoints || 0}</span>
                         </div>`;
                 });
                 
