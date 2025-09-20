@@ -400,22 +400,23 @@
 
         .table-header {
             display: grid;
-            grid-template-columns: 40px 1fr 40px 40px 50px;
-            gap: 10px;
-            padding: 10px 15px;
+            grid-template-columns: 35px 1fr 35px 35px 35px 35px 45px 45px;
+            gap: 6px;
+            padding: 8px 12px;
             background: #e9ecef;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             color: #495057;
         }
 
         .team-row {
             display: grid;
-            grid-template-columns: 40px 1fr 40px 40px 50px;
-            gap: 10px;
-            padding: 12px 15px;
+            grid-template-columns: 35px 1fr 35px 35px 35px 35px 45px 45px;
+            gap: 6px;
+            padding: 8px 12px;
             border-bottom: 1px solid #f1f3f4;
             align-items: center;
+            font-size: 12px;
         }
 
         .team-row.qualified {
@@ -429,13 +430,34 @@
         }
 
         .team-name {
-            font-size: 14px;
+            font-size: 12px;
             color: #333;
+            font-weight: 600;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
         }
 
         .points {
             font-weight: 600;
             color: #007bff;
+            text-align: center;
+        }
+        
+        .total-points {
+            color: #28a745;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .team-row span {
+            text-align: center;
+        }
+        
+        .team-row span:nth-child(2) {
+            text-align: left;
         }
 
         .round-robin-matches {
@@ -1745,11 +1767,25 @@
             }
             
             .standings-table {
-                font-size: 15px;
+                font-size: 12px;
+            }
+            
+            .table-header {
+                grid-template-columns: 25px 1fr 25px 25px 25px 25px 35px 35px;
+                gap: 3px;
+                padding: 6px 8px;
+                font-size: 9px;
             }
             
             .team-row {
-                padding: 15px;
+                grid-template-columns: 25px 1fr 25px 25px 25px 25px 35px 35px;
+                gap: 3px;
+                padding: 6px 8px;
+                font-size: 10px;
+            }
+            
+            .team-name {
+                font-size: 10px;
             }
         }
 
@@ -2784,12 +2820,15 @@
             try {
                 // ดึงข้อมูลจาก Google Sheets
                 const categoryData = await getCategoryData(category);
+                console.log('🔍 Admin - Category data loaded:', categoryData);
             currentAdminMatches = [];
             
             // รวบรวมแมทรอบแรก
                 if (categoryData.groups) {
+                    console.log('🔍 Admin - Processing groups:', categoryData.groups.length);
             categoryData.groups.forEach(group => {
                         if (group.matches) {
+                            console.log(`🔍 Admin - Group ${group.name} has ${group.matches.length} matches:`, group.matches.map(m => m.id));
                 group.matches.forEach(match => {
                     currentAdminMatches.push({
                         ...match,
@@ -2803,6 +2842,7 @@
             
             // รวบรวมแมทน็อกเอาท์ - แยกเป็นรอบ 8 ทีม และ 4 ทีม
                 if (categoryData.knockoutMatches) {
+                    console.log('🔍 Admin - Processing knockout matches:', categoryData.knockoutMatches.length, categoryData.knockoutMatches.map(m => m.id));
             categoryData.knockoutMatches.forEach((match, index) => {
                 let roundName = 'รอบ 8 ทีม';
                 
@@ -2828,6 +2868,7 @@
             
             // รวบรวมแมทชิงชนะเลิศ
                 if (categoryData.finals) {
+                    console.log('🔍 Admin - Processing finals matches:', categoryData.finals.length, categoryData.finals.map(m => m.id));
             categoryData.finals.forEach(match => {
                 currentAdminMatches.push({
                     ...match,
@@ -2841,6 +2882,8 @@
             document.getElementById('adminRoundSelect').value = '';
             
             // แสดงรายการแมททั้งหมด
+            console.log('🔍 Admin - Total matches collected:', currentAdminMatches.length);
+            console.log('🔍 Admin - All match IDs:', currentAdminMatches.map(m => m.id));
             displayFilteredMatches(currentAdminMatches, category);
                 
             } catch (error) {
@@ -3018,9 +3061,20 @@
                 matchId, 
                 isEdit, 
                 originalMatch: match,
-                round: match.round  // เพิ่ม round property
+                round: match.round,  // เพิ่ม round property
+                team1: match.team1,
+                team2: match.team2,
+                team1Id: match.team1_id || '',  // เพิ่ม team ID (ใช้ team1_id จาก Google Sheets)
+                team2Id: match.team2_id || '',  // เพิ่ม team ID (ใช้ team2_id จาก Google Sheets)
+                category: match.category || ''
             };
             console.log('Stored current match:', window.currentEditMatch);
+            console.log('Team IDs:', {
+                team1: match.team1,
+                team1Id: match.team1_id,
+                team2: match.team2,
+                team2Id: match.team2_id
+            });
 
             // Show modal
             document.getElementById('scoreModal').style.display = 'block';
@@ -3222,118 +3276,286 @@
             window.currentEditMatch = null;
         }
 
-        // ฟังก์ชันคำนวณและอัปเดต Standings
+        // ตัวแปรสำหรับ Progress Bar
+        let progressInterval = null;
+        let currentProgress = 0;
+        let realProgress = 0;
+        let lastUpdateTime = 0;
+        let isProgressRunning = false;
+        
+        // ฟังก์ชันแสดง Progress Bar สำหรับการบันทึก
+        function showSaveProgress(percentage, message) {
+            let progressContainer = document.getElementById('saveProgressContainer');
+            
+            if (!progressContainer) {
+                // สร้าง Progress Bar container
+                progressContainer = document.createElement('div');
+                progressContainer.id = 'saveProgressContainer';
+                progressContainer.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: white;
+                    border: 2px solid #007bff;
+                    border-radius: 10px;
+                    padding: 20px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                    z-index: 10000;
+                    min-width: 300px;
+                    text-align: center;
+                `;
+                
+                progressContainer.innerHTML = `
+                    <div id="saveProgressMessage" style="margin-bottom: 15px; font-weight: bold; color: #007bff;">${message}</div>
+                    <div style="background: #f0f0f0; border-radius: 10px; height: 20px; overflow: hidden; margin-bottom: 10px;">
+                        <div id="saveProgressBar" style="background: linear-gradient(90deg, #007bff, #0056b3); height: 100%; width: 0%; transition: width 0.3s ease; border-radius: 10px;"></div>
+                    </div>
+                    <div id="saveProgressText" style="font-size: 14px; color: #666;">0%</div>
+                `;
+                
+                document.body.appendChild(progressContainer);
+                
+                // เริ่ม Progress Bar ให้วิ่งต่อเนื่อง
+                startProgressAnimation();
+            }
+            
+            // อัปเดตข้อความ
+            document.getElementById('saveProgressMessage').textContent = message;
+            
+            // อัปเดตความคืบหน้าจริง
+            realProgress = percentage;
+            lastUpdateTime = Date.now();
+            
+            // ถ้าเป้าหมายคือ 100% ให้แสดง 100% ทันที
+            if (percentage === 100) {
+                currentProgress = 100;
+                const progressBar = document.getElementById('saveProgressBar');
+                const progressText = document.getElementById('saveProgressText');
+                
+                if (progressBar && progressText) {
+                    progressBar.style.width = '100%';
+                    progressText.textContent = '100%';
+                }
+            }
+        }
+        
+        // ฟังก์ชันเริ่ม Progress Bar ให้วิ่งต่อเนื่อง
+        function startProgressAnimation() {
+            if (isProgressRunning) return;
+            
+            isProgressRunning = true;
+            currentProgress = 0;
+            realProgress = 0;
+            lastUpdateTime = Date.now();
+            
+            progressInterval = setInterval(() => {
+                const now = Date.now();
+                const timeSinceLastUpdate = now - lastUpdateTime;
+                
+                // ถ้ามีการอัปเดตความคืบหน้าจริงภายใน 1 วินาทีที่ผ่านมา
+                if (timeSinceLastUpdate < 1000) {
+                    // วิ่งตามความคืบหน้าจริง
+                    if (currentProgress < realProgress) {
+                        currentProgress = Math.min(currentProgress + 1, realProgress);
+                    }
+                } else {
+                    // ถ้าหยุดนิ่งเกิน 1 วินาที ให้วิ่งต่อ 1% ต่อวินาที
+                    if (currentProgress < 99) {
+                        currentProgress = Math.min(currentProgress + 1, 99);
+                    }
+                }
+                
+                // ถ้าความคืบหน้าจริงเกินกว่าที่แสดงอยู่ ให้ตัดไปที่ความคืบหน้าจริง
+                if (realProgress > currentProgress) {
+                    currentProgress = realProgress;
+                }
+                
+                // อัปเดต Progress Bar
+                const progressBar = document.getElementById('saveProgressBar');
+                const progressText = document.getElementById('saveProgressText');
+                
+                if (progressBar && progressText) {
+                    progressBar.style.width = currentProgress + '%';
+                    progressText.textContent = currentProgress + '%';
+                }
+            }, 1000); // วิ่ง 1% ต่อ 1 วินาที
+        }
+        
+        // ฟังก์ชันอัปเดต Progress Bar ไปที่เป้าหมายทันที
+        function updateProgressToTarget(percentage, message) {
+            if (message) {
+                document.getElementById('saveProgressMessage').textContent = message;
+            }
+            
+            // อัปเดตความคืบหน้าจริง
+            realProgress = percentage;
+            lastUpdateTime = Date.now();
+            
+            // ถ้าเป้าหมายคือ 100% ให้แสดง 100% ทันที
+            if (percentage === 100) {
+                currentProgress = 100;
+                const progressBar = document.getElementById('saveProgressBar');
+                const progressText = document.getElementById('saveProgressText');
+                
+                if (progressBar && progressText) {
+                    progressBar.style.width = '100%';
+                    progressText.textContent = '100%';
+                }
+            }
+        }
+        
+        // ฟังก์ชันซ่อน Progress Bar
+        function hideSaveProgress() {
+            // หยุดการวิ่งของ Progress Bar
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+            isProgressRunning = false;
+            
+            const progressContainer = document.getElementById('saveProgressContainer');
+            if (progressContainer) {
+                progressContainer.remove();
+            }
+        }
+
+        // ฟังก์ชันคำนวณและอัปเดต Standings ตามตรรกะใหม่
         async function updateStandingsAfterMatch(matchData, category) {
             try {
-                console.log('=== UPDATE STANDINGS DEBUG ===');
-                console.log('Match data:', matchData);
-                console.log('Category:', category);
+                console.log('🚀 === UPDATE STANDINGS DEBUG (NEW LOGIC) === 🚀');
+                console.log('📊 Match data:', matchData);
+                console.log('🏸 Category:', category);
+                console.log('⏰ Function called at:', new Date().toISOString());
                 
-                // ดึงข้อมูลทีมและแมทปัจจุบัน
-                const categoryData = await getCategoryData(category);
-                const teams = categoryData.groups.flatMap(group => group.teams);
+                // ดึงข้อมูลแมทที่เสร็จแล้วจาก Google Sheets
+                const completedMatches = await getCompletedMatchesFromSheets(category);
+                console.log('Completed matches from sheets:', completedMatches);
                 
-                // คำนวณ standings ใหม่สำหรับทุกทีมในกลุ่ม
-                const standingsUpdates = [];
+                // ดึงข้อมูลทีมทั้งหมด
+                console.log('👥 Fetching teams data...');
+                const teamsData = await getTeamsData();
+                console.log('👥 All teams data:', teamsData);
+                const categoryTeams = teamsData.filter(team => team.category === category);
+                console.log('👥 Category teams:', categoryTeams);
                 
-                // หากลุ่มที่แมทนี้อยู่
-                let targetGroup = null;
-                for (const group of categoryData.groups) {
-                    const matchInGroup = group.matches.find(m => m.id === matchData.matchId);
-                    if (matchInGroup) {
-                        targetGroup = group;
+                // ดึงข้อมูล standings ปัจจุบัน
+                console.log('📊 Fetching standings data...');
+                const currentStandings = await getStandingsData();
+                console.log('📊 All standings data:', currentStandings);
+                const categoryStandings = currentStandings.filter(s => s.category === category);
+                console.log('📊 Category standings:', categoryStandings);
+                
+                // จัดกลุ่มทีมตามสาย
+                const groups = {};
+                categoryStandings.forEach(standing => {
+                    if (!groups[standing.group_name]) {
+                        groups[standing.group_name] = [];
+                    }
+                    groups[standing.group_name].push(standing);
+                });
+                
+                console.log('Groups:', groups);
+                
+                // หาทีมที่เกี่ยวข้องกับแมทที่บันทึก
+                const matchId = matchData.matchId;
+                const relatedTeams = [];
+                let matchGroup = null;
+                
+                // หาทีมที่เกี่ยวข้องจากแมทที่บันทึก
+                for (const match of completedMatches) {
+                    if (match.match_id === matchId) {
+                        relatedTeams.push(match.team1_id, match.team2_id);
+                        // หาสายของแมทนี้
+                        for (const [groupName, groupTeams] of Object.entries(groups)) {
+                            if (groupTeams.some(team => team.team_id === match.team1_id || team.team_id === match.team2_id)) {
+                                matchGroup = groupName;
+                                break;
+                            }
+                        }
                         break;
                     }
                 }
                 
-                if (!targetGroup) {
-                    console.log('Match not found in any group, skipping standings update');
-                    return;
-                }
+                console.log(`🎯 Teams related to match ${matchId}:`, relatedTeams);
+                console.log(`🏸 Match group: ${matchGroup}`);
                 
-                console.log('Target group:', targetGroup.name);
-                
-                // คำนวณสถิติใหม่สำหรับทุกทีมในกลุ่ม
-                for (const team of targetGroup.teams) {
-                    let matchesPlayed = 0;
-                    let wins = 0;
-                    let draws = 0;
-                    let losses = 0;
-                    let points = 0;
+                // คำนวณ standings ใหม่เฉพาะสายที่มีแมทที่เกี่ยวข้อง
+                if (matchGroup && groups[matchGroup]) {
+                    const groupName = matchGroup;
+                    const groupTeams = groups[matchGroup];
+                    console.log(`📊 Calculating standings for affected group: ${groupName}`);
                     
-                    // นับแมทที่แข่งแล้ว
-                    for (const match of targetGroup.matches) {
-                        if (match.completed && (match.team1 === team.name || match.team2 === team.name)) {
-                            matchesPlayed++;
+                    const standingsUpdates = [];
+                    
+                    for (const team of groupTeams) {
+                        // อัปเดตเฉพาะทีมที่เกี่ยวข้องกับแมทที่บันทึก
+                        if (relatedTeams.includes(team.team_id)) {
+                            const stats = calculateTeamStats(team.team_id, completedMatches);
+                            console.log(`📊 Updating stats for related team ${team.team_id}:`, stats);
                             
-                            if (match.team1 === team.name) {
-                                if (match.sets1 > match.sets2) {
-                                    wins++;
-                                    points += 3; // ชนะได้ 3 คะแนน
-                                } else if (match.sets1 === match.sets2) {
-                                    draws++;
-                                    points += 1; // เสมอได้ 1 คะแนน
-                                } else {
-                                    losses++;
-                                }
-                            } else {
-                                if (match.sets2 > match.sets1) {
-                                    wins++;
-                                    points += 3;
-                                } else if (match.sets2 === match.sets1) {
-                                    draws++;
-                                    points += 1;
-                                } else {
-                                    losses++;
-                                }
+                            standingsUpdates.push({
+                                team_id: team.team_id,
+                                matches_played: stats.matches_played,
+                                wins: stats.wins,
+                                draws: stats.draws,
+                                losses: stats.losses,
+                                points: stats.points,
+                                total_points_scored: stats.total_points_scored,
+                                rank_in_group: 0, // จะคำนวณใหม่
+                                qualified: false // จะคำนวณใหม่
+                            });
+                        } else {
+                            // ทีมอื่นๆ ใช้ข้อมูลเดิม แต่จะคำนวณ rank ใหม่
+                            console.log(`♻️ Using existing stats for team ${team.team_id}:`, {
+                                matches_played: team.matches_played,
+                                wins: team.wins,
+                                draws: team.draws,
+                                losses: team.losses,
+                                points: team.points,
+                                total_points_scored: team.total_points_scored
+                            });
+                            
+                            // คำนวณ points ใหม่ถ้าเป็น undefined
+                            let points = team.points;
+                            if (points === undefined || points === null) {
+                                points = (team.wins * 3) + (team.draws * 1);
+                                console.log(`🔧 Recalculated points for team ${team.team_id}: ${points}`);
                             }
+                            
+                            standingsUpdates.push({
+                                team_id: team.team_id,
+                                matches_played: team.matches_played || 0,
+                                wins: team.wins || 0,
+                                draws: team.draws || 0,
+                                losses: team.losses || 0,
+                                points: points || 0,
+                                total_points_scored: team.total_points_scored || 0,
+                                rank_in_group: 0, // จะคำนวณใหม่
+                                qualified: false // จะคำนวณใหม่
+                            });
                         }
                     }
                     
-                    // หา team_id จากข้อมูลทีม
-                    const teamData = teams.find(t => t.team_name === team.name);
-                    if (teamData && teamData.team_id) {
-                        standingsUpdates.push({
-                            team_id: teamData.team_id,
-                            matches_played: matchesPlayed,
-                            wins: wins,
-                            draws: draws,
-                            losses: losses,
-                            points: points,
-                            rank_in_group: 0, // จะคำนวณใหม่
-                            qualified: false // จะคำนวณใหม่
-                        });
-                        console.log(`Found team data for ${team.name}:`, teamData);
-                    } else {
-                        console.log(`No team data found for ${team.name}`);
-                        console.log('Available teams:', teams.map(t => ({ name: t.team_name, id: t.team_id })));
+                    // จัดอันดับในสาย
+                    rankTeamsInGroup(standingsUpdates);
+                    
+                    console.log(`Ranked standings for ${groupName}:`, standingsUpdates);
+                    
+                    // อัปเดต standings ใน Google Sheets
+                    console.log(`=== UPDATING ${standingsUpdates.length} TEAMS IN AFFECTED GROUP ===`);
+                    for (const standing of standingsUpdates) {
+                        console.log(`🔄 Updating standings for team_id: ${standing.team_id}`);
+                        console.log('Standing data:', standing);
+                        try {
+                            const result = await updateStandingsInSheets(standing);
+                            console.log(`✅ Standings update result for ${standing.team_id}:`, result);
+                        } catch (error) {
+                            console.error(`❌ Error updating standings for ${standing.team_id}:`, error);
+                        }
                     }
-                }
-                
-                // เรียงลำดับตามคะแนน
-                standingsUpdates.sort((a, b) => {
-                    if (b.points !== a.points) return b.points - a.points;
-                    return b.wins - a.wins; // ถ้าคะแนนเท่ากัน ดูที่จำนวนชนะ
-                });
-                
-                // กำหนดอันดับและสถานะผ่านเข้ารอบ
-                standingsUpdates.forEach((standing, index) => {
-                    standing.rank_in_group = index + 1;
-                    standing.qualified = index < 2; // อันดับ 1-2 ผ่านเข้ารอบ
-                });
-                
-                console.log('Standings updates:', standingsUpdates);
-                
-                if (standingsUpdates.length === 0) {
-                    console.log('No standings to update - no teams found with team_id');
-                    return;
-                }
-                
-                // อัปเดต standings ใน Google Sheets
-                for (const standing of standingsUpdates) {
-                    console.log(`Updating standings for team_id: ${standing.team_id}`);
-                    const result = await updateStandingsInSheets(standing);
-                    console.log(`Standings update result for ${standing.team_id}:`, result);
+                } else {
+                    console.log('⚠️ No affected group found for the match');
                 }
                 
                 console.log('All standings updated successfully');
@@ -3341,6 +3563,129 @@
             } catch (error) {
                 console.error('Error updating standings:', error);
             }
+        }
+        
+        // ฟังก์ชันดึงข้อมูลแมทที่เสร็จแล้วจาก Google Sheets
+        async function getCompletedMatchesFromSheets(category) {
+            try {
+                console.log('🔍 Fetching completed matches for category:', category);
+                console.log('🌐 Request URL:', `${GOOGLE_APPS_SCRIPT_URL}?action=getCategoryData&category=${encodeURIComponent(category)}`);
+                
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getCategoryData&category=${encodeURIComponent(category)}`);
+                console.log('📡 Response status:', response.status);
+                
+                const result = await response.json();
+                console.log('📋 Response result:', result);
+                
+                if (result.status === 'success') {
+                    console.log('Raw matches data:', result.data.matches);
+                    
+                    // กรองเฉพาะแมทรอบแรกที่เสร็จแล้ว
+                    const completedMatches = result.data.matches.filter(match => 
+                        match.round_type === 'รอบแรก' && 
+                        match.match_status === 'completed'
+                    );
+                    
+                    console.log('Filtered completed matches:', completedMatches);
+                    return completedMatches;
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Error fetching completed matches:', error);
+                return [];
+            }
+        }
+        
+        // ฟังก์ชันคำนวณสถิติทีมตามตรรกะใหม่
+        function calculateTeamStats(teamId, completedMatches) {
+            console.log(`=== CALCULATING STATS FOR TEAM ${teamId} ===`);
+            console.log('Completed matches to process:', completedMatches);
+            
+            let stats = {
+                matches_played: 0,
+                wins: 0,
+                draws: 0,
+                losses: 0,
+                points: 0,
+                total_points_scored: 0
+            };
+            
+            completedMatches.forEach(match => {
+                console.log(`Processing match ${match.match_id}: ${match.team1_id} vs ${match.team2_id}, winner: ${match.winner_id}`);
+                
+                if (match.team1_id === teamId || match.team2_id === teamId) {
+                    stats.matches_played++;
+                    console.log(`Team ${teamId} found in match ${match.match_id}, matches_played: ${stats.matches_played}`);
+                    
+                    // คำนวณผลแพ้ชนะ
+                    if (match.winner_id === teamId) {
+                        stats.wins++;
+                        console.log(`Team ${teamId} won match ${match.match_id}, wins: ${stats.wins}`);
+                    } else if (match.winner_id === "" || match.winner_id === null) {
+                        stats.draws++;
+                        console.log(`Match ${match.match_id} was a draw, draws: ${stats.draws}`);
+                    } else {
+                        stats.losses++;
+                        console.log(`Team ${teamId} lost match ${match.match_id}, losses: ${stats.losses}`);
+                    }
+                    
+                    // คำนวณแต้มที่ตีได้
+                    if (match.team1_id === teamId) {
+                        const points = (match.set1_team1 || 0) + (match.set2_team1 || 0) + (match.set3_team1 || 0);
+                        stats.total_points_scored += points;
+                        console.log(`Team ${teamId} as team1 scored ${points} points in match ${match.match_id}, total: ${stats.total_points_scored}`);
+                    } else {
+                        const points = (match.set1_team2 || 0) + (match.set2_team2 || 0) + (match.set3_team2 || 0);
+                        stats.total_points_scored += points;
+                        console.log(`Team ${teamId} as team2 scored ${points} points in match ${match.match_id}, total: ${stats.total_points_scored}`);
+                    }
+                }
+            });
+            
+            // คำนวณคะแนนรวม (3-1-0 system)
+            stats.points = (stats.wins * 3) + (stats.draws * 1);
+            
+            console.log(`Final stats for team ${teamId}:`, stats);
+            return stats;
+        }
+        
+        // ฟังก์ชันจัดอันดับทีมในสาย
+        function rankTeamsInGroup(standingsUpdates) {
+            console.log('=== RANKING TEAMS IN GROUP ===');
+            console.log('Teams before ranking:', standingsUpdates);
+            
+            // เรียงลำดับตามเกณฑ์
+            standingsUpdates.sort((a, b) => {
+                // เกณฑ์ที่ 1: คะแนนรวม (มาก → น้อย)
+                if (b.points !== a.points) {
+                    return b.points - a.points;
+                }
+                
+                // เกณฑ์ที่ 2: แต้มรวม (มาก → น้อย)
+                if (b.total_points_scored !== a.total_points_scored) {
+                    return b.total_points_scored - a.total_points_scored;
+                }
+                
+                // เกณฑ์ที่ 3: จำนวนชนะ (มาก → น้อย)
+                return b.wins - a.wins;
+            });
+            
+            // กำหนดอันดับและสถานะผ่านเข้ารอบ
+            standingsUpdates.forEach((standing, index) => {
+                standing.rank_in_group = index + 1;
+                standing.qualified = index < 2; // อันดับ 1-2 ผ่านเข้ารอบ
+                console.log(`Team ${standing.team_id}: rank=${standing.rank_in_group}, qualified=${standing.qualified}, points=${standing.points}`);
+                
+                // Debug เฉพาะ points
+                console.log(`🔍 POINTS DEBUG - rankTeamsInGroup:`);
+                console.log(`  - Team: ${standing.team_id}`);
+                console.log(`  - Points: ${standing.points} (type: ${typeof standing.points})`);
+                console.log(`  - Wins: ${standing.wins}, Draws: ${standing.draws}`);
+                console.log(`  - Calculated points: ${(standing.wins * 3) + (standing.draws * 1)}`);
+            });
+            
+            console.log('Teams after ranking:', standingsUpdates);
         }
         
         // ฟังก์ชันอัปเดต standings ใน Google Sheets
@@ -3358,15 +3703,22 @@
                 const params = new URLSearchParams({
                     action: 'updateStandings',
                     team_id: standingsData.team_id,
-                    matches_played: standingsData.matches_played,
-                    wins: standingsData.wins,
-                    draws: standingsData.draws,
-                    losses: standingsData.losses,
-                    points: standingsData.points,
+                    matches_played: standingsData.matches_played || 0,
+                    wins: standingsData.wins || 0,
+                    draws: standingsData.draws || 0,
+                    losses: standingsData.losses || 0,
+                    points: standingsData.points || 0,
                     total_points_scored: standingsData.total_points_scored || 0,
-                    rank_in_group: standingsData.rank_in_group,
-                    qualified: standingsData.qualified
+                    rank_in_group: standingsData.rank_in_group || 1,
+                    qualified: standingsData.qualified || false
                 });
+                
+                console.log('URL Parameters being sent:', Object.fromEntries(params));
+                console.log('🔍 POINTS DEBUG - Frontend:');
+                console.log('  - Original standingsData.points:', standingsData.points);
+                console.log('  - Type:', typeof standingsData.points);
+                console.log('  - URL param points:', params.get('points'));
+                console.log('  - Rank value:', standingsData.rank_in_group);
                 
                 const requestUrl = `${GOOGLE_APPS_SCRIPT_URL}?${params.toString()}`;
                 console.log('Request URL:', requestUrl);
@@ -3428,6 +3780,12 @@
                     status: matchData['Status'] || ''
                 });
                 
+                console.log('URL Parameters debug:', {
+                    'Winner ID': matchData['Winner ID'],
+                    winnerId: matchData['Winner ID'] || '',
+                    allParams: Object.fromEntries(params)
+                });
+                
                 const requestUrl = `${GOOGLE_APPS_SCRIPT_URL}?${params.toString()}`;
                 console.log('Request URL:', requestUrl);
                 
@@ -3463,6 +3821,10 @@
 
         async function saveMatchScore() {
             if (!window.currentEditMatch) return;
+            
+            console.log('=== SAVE MATCH SCORE DEBUG ===');
+            console.log('Is editing existing match:', window.currentEditMatch.isEdit);
+            console.log('Current edit match data:', window.currentEditMatch);
 
             const sets = [
                 {
@@ -3519,6 +3881,12 @@
             console.log('isRoundRobin:', isRoundRobin);
             console.log('team1Sets:', team1Sets, 'team2Sets:', team2Sets);
             
+            // Debug: ตรวจสอบข้อมูลแมทต้นฉบับ
+            if (window.currentEditMatch && window.currentEditMatch.originalMatch) {
+                console.log('Original match data:', window.currentEditMatch.originalMatch);
+                console.log('Original match round:', window.currentEditMatch.originalMatch.round);
+            }
+            
             if (isRoundRobin) {
                 // รอบแรก: แข่ง 2 เซ็ตเท่านั้น
                 // อนุญาต: 0-0 (ยังไม่แข่ง), 1-0, 0-1, 1-1 (เสมอ)
@@ -3544,21 +3912,27 @@
             }
 
 
-            // กำหนดผู้ชนะ
+            // กำหนดผู้ชนะและหา ID ทีมชนะ
             let winner;
+            let winnerId = '';
+            
             if (isRoundRobin) {
                 if (team1Sets === 0 && team2Sets === 0) {
                     // รอบแรกยังไม่แข่ง - ไม่มีผู้ชนะ
                     winner = '';
+                    winnerId = '';
                 } else if (team1Sets === team2Sets) {
                     // รอบแรกเสมอ - ไม่มีผู้ชนะ
                     winner = '';
+                    winnerId = '';
                 } else {
                     // รอบแรกมีผู้ชนะ
                     winner = team1Sets > team2Sets ? window.currentEditMatch.team1 : window.currentEditMatch.team2;
+                    winnerId = team1Sets > team2Sets ? window.currentEditMatch.team1Id : window.currentEditMatch.team2Id;
                 }
             } else {
                 winner = team1Sets > team2Sets ? window.currentEditMatch.team1 : window.currentEditMatch.team2;
+                winnerId = team1Sets > team2Sets ? window.currentEditMatch.team1Id : window.currentEditMatch.team2Id;
             }
 
             // เตรียมข้อมูลสำหรับบันทึกลง Google Sheets
@@ -3570,24 +3944,37 @@
                 'Set2 T2': sets[1].team2,
                 'Set3 T1': sets[2].team1,
                 'Set3 T2': sets[2].team2,
-                'Winner ID': winner,
+                'Winner ID': winnerId,
                 'Court': '',
                 'Status': 'completed'
             };
             
             console.log('Prepared match data:', matchData);
+            console.log('Winner ID debug:', {
+                winner: winner,
+                winnerId: winnerId,
+                team1Sets: team1Sets,
+                team2Sets: team2Sets,
+                team1Id: window.currentEditMatch.team1Id,
+                team2Id: window.currentEditMatch.team2Id
+            });
 
             // แสดงสถานะการบันทึก
             const saveBtn = document.querySelector('.btn-save');
             const originalText = saveBtn.textContent;
             saveBtn.textContent = 'กำลังบันทึก...';
             saveBtn.disabled = true;
+            
+            // แสดง Progress Bar
+            showSaveProgress(0, 'กำลังบันทึกผลการแข่งขัน...');
 
             try {
                 // บันทึกลง Google Sheets
+                showSaveProgress(20, 'กำลังบันทึกผลการแข่งขัน...');
                 const result = await updateMatchInSheets(matchData);
                 
                 if (result.success) {
+                    showSaveProgress(40, 'บันทึกผลการแข่งขันสำเร็จ');
                     let resultText;
                     if (isRoundRobin) {
                         if (team1Sets === 0 && team2Sets === 0) {
@@ -3603,18 +3990,34 @@
                     
                     // อัปเดต Standings สำหรับรอบแรกเท่านั้น
                     if (isRoundRobin) {
+                        showSaveProgress(50, 'กำลังคำนวณตารางคะแนน...');
+                        console.log('=== TRIGGERING STANDINGS UPDATE ===');
+                        console.log('Match data for standings:', matchData);
+                        console.log('Category for standings:', window.currentEditMatch.category);
                         console.log('Updating standings for round robin match...');
                         try {
-                            await updateStandingsAfterMatch(matchData, window.currentEditMatch.category);
-                            console.log('Standings updated successfully');
+                            // แปลงชื่อประเภทให้ตรงกับ Google Sheets
+                            const categoryName = getCategoryDisplayName(window.currentEditMatch.category);
+                            console.log('🔄 Converting category:', window.currentEditMatch.category, '->', categoryName);
+                            await updateStandingsAfterMatch(matchData, categoryName);
+                            showSaveProgress(80, 'คำนวณตารางคะแนนสำเร็จ');
+                            console.log('✅ Standings updated successfully');
                         } catch (standingsError) {
-                            console.error('Error updating standings:', standingsError);
+                            console.error('❌ Error updating standings:', standingsError);
                             // ไม่หยุดการทำงาน แค่แสดง error ใน console
                         }
+                    } else {
+                        console.log('Not a round robin match, skipping standings update');
                     }
                     
-                    alert(`✅ บันทึกผลสำเร็จ!\n\nแมท: ${window.currentEditMatch.matchId}\n${resultText}\n\nข้อมูลได้ถูกบันทึกลง Google Sheets แล้ว${isRoundRobin ? '\n📊 ตารางคะแนนได้รับการอัปเดตแล้ว' : ''}`);
+                    updateProgressToTarget(100, 'บันทึกข้อมูลสำเร็จ!');
+                    
+                    // รอสักครู่เพื่อให้ผู้ใช้เห็น 100% แล้วซ่อน Progress Bar
+                    setTimeout(() => {
+                        hideSaveProgress();
+                        alert(`✅ บันทึกผลสำเร็จ!\n\nแมท: ${window.currentEditMatch.matchId}\n${resultText}\n\nข้อมูลได้ถูกบันทึกลง Google Sheets แล้ว${isRoundRobin ? '\n📊 ตารางคะแนนได้รับการอัปเดตแล้ว' : ''}`);
             closeScoreModal();
+                    }, 1000);
             
                     // ล้าง cache และรีเฟรชข้อมูล
                     const category = document.getElementById('adminCategorySelect').value;
@@ -3624,6 +4027,7 @@
                     }
                     
                     // แสดงสถานะการรีเฟรช
+                    showSaveProgress(90, 'กำลังรีเฟรชข้อมูล...');
                     const matchesList = document.getElementById('adminMatchesList');
                     matchesList.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>กำลังรีเฟรชข้อมูลหลังบันทึก...</div></div>';
                     
@@ -3646,12 +4050,19 @@
                                 filterAllMatches();
                             }
                         }
+                        
+                        // ซ่อน Progress Bar หลังจากรีเฟรชเสร็จ
+                        setTimeout(() => {
+                            hideSaveProgress();
+                        }, 500);
                     }, 500);
                 } else {
+                    hideSaveProgress();
                     alert(`❌ ไม่สามารถบันทึกข้อมูลได้\n\nข้อผิดพลาด: ${result.message}\n\nกรุณาลองใหม่อีกครั้ง`);
                 }
             } catch (error) {
                 console.error('Error saving match score:', error);
+                hideSaveProgress();
                 alert(`❌ เกิดข้อผิดพลาดในการบันทึก\n\nข้อผิดพลาด: ${error.message}\n\nกรุณาลองใหม่อีกครั้ง`);
             } finally {
                 // รีเซ็ตปุ่ม
@@ -4019,6 +4430,20 @@
             };
             return categoryMap[categoryName] || categoryName;
         }
+        
+        // ฟังก์ชันแปลง category key เป็น display name
+        function getCategoryDisplayName(categoryKey) {
+            const categoryMap = {
+                'A': 'มือ A',
+                'B': 'มือ B', 
+                'C-B': 'มือ C-B',
+                'C-C': 'มือ C-C',
+                'D': 'มือ D',
+                'ใหม่': 'มือใหม่',
+                'ผสม': 'มือผสม'
+            };
+            return categoryMap[categoryKey] || categoryKey;
+        }
 
         // ฟังก์ชันดึงข้อมูลทีมจาก Google Sheets
         async function getTeamsData() {
@@ -4090,7 +4515,10 @@
                     name: standing.team_name,
                     matches: standing.matches_played,
                     wins: standing.wins,
+                    draws: standing.draws || 0,
+                    losses: standing.losses || 0,
                     points: standing.points,
+                    totalPoints: standing.total_points_scored || 0,
                     qualified: standing.qualified
                 });
             });
@@ -4109,6 +4537,10 @@
                         id: m.match_id,
                         team1: m.team1_name,
                         team2: m.team2_name,
+                        team1_id: m.team1_id,  // เพิ่ม team1_id
+                        team2_id: m.team2_id,  // เพิ่ม team2_id
+                        round: 'รอบแรก',  // เพิ่ม round
+                        category: category,  // เพิ่ม category
                         score1: [m.set1_team1, m.set2_team1, m.set3_team1].filter(s => s > 0),
                         score2: [m.set1_team2, m.set2_team2, m.set3_team2].filter(s => s > 0),
                         sets1: (m.set1_team1 > m.set1_team2 ? 1 : 0) + (m.set2_team1 > m.set2_team2 ? 1 : 0) + (m.set3_team1 > m.set3_team2 ? 1 : 0),
@@ -4125,6 +4557,10 @@
                 id: m.match_id,
                 team1: m.team1_name,
                 team2: m.team2_name,
+                team1_id: m.team1_id,  // เพิ่ม team1_id
+                team2_id: m.team2_id,  // เพิ่ม team2_id
+                round: m.round_type,  // เพิ่ม round
+                category: category,  // เพิ่ม category
                 score1: [m.set1_team1, m.set2_team1, m.set3_team1].filter(s => s > 0),
                 score2: [m.set1_team2, m.set2_team2, m.set3_team2].filter(s => s > 0),
                 sets1: (m.set1_team1 > m.set1_team2 ? 1 : 0) + (m.set2_team1 > m.set2_team2 ? 1 : 0) + (m.set3_team1 > m.set3_team2 ? 1 : 0),
@@ -4138,6 +4574,10 @@
                 type: m.round_type === 'ชิงชนะเลิศ' ? 'championship' : 'third-place',
                 team1: m.team1_name,
                 team2: m.team2_name,
+                team1_id: m.team1_id,  // เพิ่ม team1_id
+                team2_id: m.team2_id,  // เพิ่ม team2_id
+                round: m.round_type,  // เพิ่ม round
+                category: category,  // เพิ่ม category
                 score1: [m.set1_team1, m.set2_team1, m.set3_team1].filter(s => s > 0),
                 score2: [m.set1_team2, m.set2_team2, m.set3_team2].filter(s => s > 0),
                 sets1: (m.set1_team1 > m.set1_team2 ? 1 : 0) + (m.set2_team1 > m.set2_team2 ? 1 : 0) + (m.set3_team1 > m.set3_team2 ? 1 : 0),
@@ -4604,31 +5044,32 @@
             
             let content = '<div class="groups-container">';
             
-            // ซ่อนตารางสรุปของสาย (Standings Table) ชั่วคราว
-            /*
+            // แสดงตารางสรุปของสาย (Standings Table)
             data.groups.forEach(group => {
                 content += `
                     <div class="group-card">
                         <div class="group-title">${group.name}</div>
                         <div class="standings-table">
                             <div class="table-header">
-                                <span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>คะแนน</span>
+                                <span>อันดับ</span><span>ทีม</span><span>แมท</span><span>ชนะ</span><span>เสมอ</span><span>แพ้</span><span>คะแนน</span><span>แต้ม</span>
                             </div>`;
                             
                 group.teams.forEach(team => {
                     content += `
-                        <div class="team-row ${team.qualified ? 'qualified' : ''}">
+                        <div class="team-row">
                             <span class="rank">${team.rank}</span>
                             <span class="team-name">${team.name}</span>
                             <span>${team.matches}</span>
                             <span>${team.wins}</span>
+                            <span>${team.draws || 0}</span>
+                            <span>${team.losses || 0}</span>
                             <span class="points">${team.points}</span>
+                            <span class="total-points">${team.totalPoints || 0}</span>
                         </div>`;
                 });
                 
                 content += '</div></div>';
             });
-            */
             
             content += '</div>';
             
@@ -4940,7 +5381,7 @@
                         <div class="admin-tabs-nav">
                             <button class="admin-tab-btn active" onclick="switchAdminTab('match-management')">📝 บันทึกผล</button>
                             <button class="admin-tab-btn" onclick="switchAdminTab('all-matches')">📋 ตารางแมท</button>
-                            <button class="admin-tab-btn" onclick="switchAdminTab('draw-system')">🎲 จับฉลาก</button>
+                            <!-- <button class="admin-tab-btn" onclick="switchAdminTab('draw-system')">🎲 จับฉลาก</button> -->
                             <button class="admin-tab-btn" onclick="switchAdminTab('settings')">⚙️ ตั้งค่า</button>
                         </div>
                         <div class="admin-tab-content" id="adminTabContent">
@@ -4991,8 +5432,6 @@
                         btn.classList.add('active');
                     } else if (btn.textContent.includes('📋 ตารางแมท') && tab === 'all-matches') {
                         btn.classList.add('active');
-                    } else if (btn.textContent.includes('🎲 จับฉลาก') && tab === 'draw-system') {
-                        btn.classList.add('active');
                     } else if (btn.textContent.includes('⚙️ ตั้งค่า') && tab === 'settings') {
                         btn.classList.add('active');
                     }
@@ -5030,7 +5469,8 @@
                     updateProgressBar();
                     return content;
                 case 'draw-system':
-                    return await generateDrawSystemContent();
+                    // ซ่อนเมนูจับฉลาก
+                    return '<div class="admin-placeholder">เมนูจับฉลากถูกซ่อนไว้ชั่วคราว</div>';
                 case 'settings':
                     return generateSettingsContent();
                 default:
@@ -5638,7 +6078,7 @@
         const GOOGLE_SHEETS_ID = '1xtwqAxLOdKJknKxxYCNQ14Vm2inMIfuKg5Xddsy69rw';
         
         // Google Apps Script Web App URL - ต้องอัปเดตหลังจาก Deploy
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRKVfDFNme3IXbyfiAvdcOO0JhlVrZarBPlI77EQJzVMIyzIZYDwBxKcl3wQJ_QMiSDw/exec';
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzDb84dpt5-VnRVb90ObvHnp8NkCdYl3KeeaSVWmn0-v_nc1ikG2maq0AswYFN7dz4PEw/exec';
 
         function generateSettingsContent() {
             return `
